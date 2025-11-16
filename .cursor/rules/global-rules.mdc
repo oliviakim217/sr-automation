@@ -1,0 +1,157 @@
+---
+alwaysApply: true
+---
+
+## **Global Rules**
+
+### General
+
+1. Always follow programming best practices.
+2. Code with production in mind (see Production Environment section below).
+3. Think in layers - separate concerns (data, business logic, presentation).
+4. Always validate inputs. Use if-else statements and multiple validation checks.
+5. Add comments on each section explaining what it does and why.
+6. Have a max limiter (ceiling) for anything that could grow infinitely. Example: Log files older than 90 days should be zipped or deleted.
+7. Use GitHub to version control all code with meaningful commit messages.
+8. Write code that works in both dev (development/testing) and prod (production/live) environments.
+
+### Production Environment Basics
+
+**What is Production?** Production is the live environment where real users interact with your application. It's different from development where you test and experiment.
+
+**Key Production Considerations:**
+
+1. **Error Handling**: Production code must handle errors gracefully without crashing. Use try-except blocks, return meaningful error messages, and log errors for debugging.
+2. **Security**: Never expose sensitive data (passwords, API keys) in code. Use environment variables or secure config files. Validate all user inputs to prevent attacks.
+3. **Performance**: Code should run efficiently. Avoid infinite loops, optimize database queries, and handle large datasets properly.
+4. **Monitoring**: Add logging so you can track what's happening in production. Log important events, errors, and performance metrics.
+5. **Reliability**: Code should work consistently. Handle edge cases, network failures, and unexpected inputs.
+6. **Scalability**: Design code to handle growth (more users, more data) without major rewrites.
+7. **Documentation**: Document how to deploy, configure, and troubleshoot the application.
+8. **Backup & Recovery**: Have a plan for data backup and recovery in case something goes wrong.
+
+### Config Files
+
+1. Have a separate configuration file (in YAML) with a source (where data comes from) and a target (where it goes) specified.
+2. Every config should have a version number. Always version control config schemas so you can track changes.
+3. Use environment variables to select the config version. NO hard coding values in code - this makes it hard to change between dev/prod.
+4. Example:
+    
+    ```yaml
+    version: "1.1"
+    source:
+      instance: "service1"
+      category: "request"
+    target:
+      endpoint: "https://api.example.com"
+    ```
+    
+5. Create a "constants.py" file to store constants (values that don't change) in JSON format.
+6. **ENV vs Config File**: Use ENV for secrets (passwords, API keys) and environment-specific values (dev/prod URLs). Use config files for application settings, mappings, and business rules.
+
+### Testing
+
+1. Create sample test data files to test with. Use realistic but fake data that mimics production scenarios.
+2. Make code testable without modifying main.py. Test different scenarios by changing configuration files only.
+3. Support testing via command line and HTTP requests (curl).
+4. Command line example: `python ./backend/main.py --config-file configs/test-config.yaml`
+5. HTTP request example: `curl -X POST http://localhost:8000/api/endpoint -H "Content-Type: application/json" -d '{"content": "test data"}'`
+6. Create shell scripts to automate repetitive testing tasks.
+7. Test both success cases (happy path) and failure cases (error handling, invalid inputs).
+8. In production, test with small datasets first, then gradually increase to production-like volumes.
+
+### Validation
+
+1. Create a separate module for validation (e.g., `validation.py`). 
+    
+    ```python
+    def _validate(input_data):
+        # Validate date formats
+        # Validate required fields exist
+        # Validate data types and ranges
+        # Return True if valid, False with error message if invalid
+    ```
+    
+2. After validation, cleanse and transform the data. `def _transform():` - Clean up data (remove whitespace, fix formats, normalize values).
+3. Then enrich by adding metadata. `def _enrich():` - Add priority, caller, urgency, timestamps, and other business context.
+4. **Data Pipeline Order**: Validate → Transform → Enrich → Process → Output
+
+### Error Handling
+
+1. Always use try-except blocks to catch and handle errors gracefully.
+2. Log errors with context (what operation failed, input values, timestamp).
+3. Return meaningful error messages to users (don't expose internal system details).
+4. Handle common failures: network timeouts, invalid inputs, missing files, database connection errors.
+5. Example:
+    ```python
+    try:
+        result = process_data(input_data)
+    except ValueError as e:
+        logger.error(f"Invalid input: {e}")
+        return {"status": "error", "message": "Invalid input provided"}
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}", exc_info=True)
+        return {"status": "error", "message": "An error occurred"}
+    ```
+
+### Logging
+
+1. Use proper logging (Python's `logging` module), NOT print statements. Print statements don't work well in production.
+2. Set appropriate log levels: DEBUG (detailed info), INFO (general info), WARNING (potential issues), ERROR (errors), CRITICAL (serious failures).
+3. Log important events: function entry/exit, data transformations, API calls, errors.
+4. Include context in logs: timestamps, function names, relevant data (but not sensitive info like passwords).
+5. In production, log to files with rotation (new file daily/weekly) to prevent disk space issues.
+
+### Folder Structure
+
+1. The folder structure should be scalable - organized so you can add new features without major restructuring.
+2. Never put "main.py" at the top level. It should be under "backend" folder (e.g., `backend/main.py`).
+3. Recommended structure:
+    ```
+    project/
+    ├── backend/
+    │   ├── main.py
+    │   ├── modules/
+    │   ├── config/
+    │   └── utils/
+    ├── configs/
+    │   ├── dev/
+    │   └── prod/
+    ├── tests/
+    ├── logs/
+    └── .cursor/rules/
+    ```
+4. Rules should be organized in layers:
+    - global-rules (this file)
+    - python-rules (Python-specific best practices)
+    - project-rules (project-specific conventions)
+    - shell-scripting-rules (if using shell scripts)
+    - platform-rules (GCP/AWS specific - prefix variables with platform name, e.g., `GCP_`, `AWS_`)
+    - cursor-rules (Cursor IDE specific)
+5. All rules files should be versioned (include version number in file or comments).
+6. Create a scalable folder structure with clear separation: modules for business logic, utils for helpers, config for settings.
+
+### Naming Convention
+
+1. Use unique, descriptive variable names that are easy to search & replace.
+2. Variable names should be unique and meaningful - avoid generic names like `data`, `temp`, `x`.
+3. Use unique prefixes in variable/function names to identify related groups (e.g., `cfg_` for config, `api_` for API-related).
+4. Follow Python naming conventions: `snake_case` for variables/functions, `PascalCase` for classes, `UPPER_CASE` for constants.
+5. Keep testing in mind - use names that make test cases clear.
+6. Use specific, descriptive names. Example: Instead of `date`, use `dt_txn` (transaction date) or `dt_created` (creation date). Align with domain standards (banking, healthcare, etc.).
+7. Prefix private/internal functions with underscore: `def _my_internal_function():` - indicates it's not meant to be called from outside the module.
+8. Use consistent naming patterns across the codebase for easier maintenance.
+
+### Code Documentation & Explanation
+
+- **For Beginners**: Include short explanations and comments for each section explaining what it does and why.
+- **Avoid Jargon**: Explain technical terms and what each library/module does in simple terms.
+- **Post-Generation Instructions**: Explain what to do with the code after generation:
+    - How to save it
+    - How to run it (command line examples)
+    - How to test it (test commands)
+    - Dependencies to install
+- **Examples**: Include sample input and output examples showing:
+    - What input the function expects
+    - What output it produces
+    - Example use cases
