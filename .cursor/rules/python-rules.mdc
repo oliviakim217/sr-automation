@@ -1,3 +1,188 @@
 ---
 alwaysApply: true
 ---
+
+## **Python Best Practices**
+
+### Code Style (PEP 8)
+
+1. **Indentation**: Use 4 spaces (never tabs). Most editors can be configured to insert spaces when you press Tab.
+2. **Line Length**: Keep lines under 100 characters (80 is ideal, but 100 is acceptable for modern screens).
+3. **Blank Lines**: Use blank lines to separate functions, classes, and logical sections. Two blank lines between top-level functions/classes.
+4. **Imports**: Organize imports in this order (separate each group with a blank line):
+   - Standard library imports
+   - Third-party imports
+   - Local application imports
+5. **Example**:
+   ```python
+   # Standard library
+   import os
+   import json
+   from datetime import datetime
+   
+   # Third-party
+   import requests
+   import yaml
+   
+   # Local
+   from backend.modules.validation import validate_data
+   ```
+
+### Type Hints (Optional but Recommended)
+
+1. Use type hints for function parameters and return values to make code more readable and catch errors early.
+2. Basic examples:
+   ```python
+   def process_data(input_data: dict) -> dict:
+       """Process input data and return result."""
+       return {"status": "success", "data": input_data}
+   
+   def calculate_total(items: list[float]) -> float:
+       """Calculate sum of items."""
+       return sum(items)
+   ```
+3. For complex types, use `from typing import Dict, List, Optional, Union`.
+
+### Virtual Environments & Dependencies
+
+1. **Always use a virtual environment** to isolate project dependencies:
+   ```bash
+   python -m venv venv
+   # Windows: venv\Scripts\activate
+   # Mac/Linux: source venv/bin/activate
+   ```
+2. Use `requirements.txt` to track dependencies with version numbers:
+   ```txt
+   requests==2.31.0
+   pyyaml==6.0.1
+   ```
+3. Generate requirements: `pip freeze > requirements.txt`
+4. **Never commit** `venv/` folder to Git (already in .gitignore).
+
+### Functions and Methods
+
+1. **Single Responsibility**: Each function should do one thing well.
+2. **Function Length**: Keep functions under 50 lines if possible. If longer, consider breaking into smaller functions.
+3. **Function Names**: Use descriptive verbs: `validate_input()`, `process_data()`, `calculate_total()`.
+4. **Return Early**: Use early returns to reduce nesting:
+   ```python
+   def validate_user(user_data: dict) -> bool:
+       if not user_data:
+           return False
+       if "email" not in user_data:
+           return False
+       return True
+   ```
+
+### Comprehensions & Iteration
+
+1. Use comprehensions for simple transformations (but keep them readable):
+   ```python
+   squared_numbers = [x**2 for x in range(10)]
+   user_emails = {user["id"]: user["email"] for user in users}
+   ```
+2. **Avoid** overly complex comprehensions - use a regular loop if it's clearer.
+3. **Dictionary operations**: Use `.get()` for safe access: `value = my_dict.get("key", "default")`
+4. **Iterate properly**: Use `.items()` for dictionaries, `enumerate()` when you need index and value.
+
+### Context Managers & File Operations
+
+1. Always use `with` statements for file operations and resources that need cleanup:
+   ```python
+   with open("data.json", "r") as file:
+       data = json.load(file)
+   # File automatically closed
+   ```
+2. Use context managers for database connections if your library supports them.
+
+### Docstrings
+
+1. Write docstrings for all functions, classes, and modules using triple quotes `"""`.
+2. Simple format:
+   ```python
+   def process_transaction(transaction_data: dict) -> dict:
+       """
+       Process a financial transaction.
+       
+       Args:
+           transaction_data: Dictionary containing transaction details
+           
+       Returns:
+           Dictionary with processing result and status
+           
+       Raises:
+           ValueError: If transaction data is invalid
+       """
+   ```
+
+### Error Handling (Python-Specific)
+
+1. **Catch specific exceptions** first, then general ones:
+   ```python
+   try:
+       result = process_data(data)
+   except ValueError as e:
+       logger.error(f"Invalid data: {e}")
+   except FileNotFoundError as e:
+       logger.error(f"File not found: {e}")
+   except Exception as e:
+       logger.error(f"Unexpected error: {e}", exc_info=True)
+   ```
+2. **Don't use bare `except:`** - always specify exception types.
+3. **Use `finally`** for cleanup code that must run.
+
+### String Formatting
+
+1. Use f-strings (Python 3.6+) for string formatting:
+   ```python
+   name = "Alice"
+   age = 30
+   message = f"Hello, {name}. You are {age} years old."
+   logger.info(f"Processing user {user_id} with {item_count} items")
+   ```
+2. Avoid `.format()` and `%` formatting unless necessary for compatibility.
+
+### Constants and Configuration
+
+1. Define constants at module level using `UPPER_CASE`:
+   ```python
+   MAX_RETRY_ATTEMPTS = 3
+   DEFAULT_TIMEOUT = 30
+   API_BASE_URL = "https://api.example.com"
+   ```
+2. Store constants in a separate `constants.py` file (as per global rules).
+3. Use environment variables for sensitive or environment-specific values.
+
+### Security Best Practices
+
+1. **Never use `eval()` or `exec()`** with user input - major security risk.
+2. **Validate and sanitize** all user inputs before processing.
+3. **Use parameterized queries** for database operations (prevents SQL injection).
+4. **Store secrets** in environment variables, never in code.
+5. **Use `secrets` module** for generating random tokens/passwords:
+   ```python
+   import secrets
+   token = secrets.token_urlsafe(32)
+   ```
+
+### Performance Tips
+
+1. **Use generators** for large datasets:
+   ```python
+   def read_large_file(filename: str):
+       with open(filename) as file:
+           for line in file:
+               yield process_line(line)
+   ```
+2. **Avoid premature optimization** - write clear code first, optimize if needed.
+3. **Use built-in functions** when possible (`sum()`, `max()`, `min()`, `any()`, `all()`).
+
+### Common Python Patterns
+
+1. **Guard clauses**: Check conditions early and return to reduce nesting.
+2. **Use `zip()`** to iterate over multiple lists: `for name, age in zip(names, ages):`
+
+### Testing Support
+
+1. Write testable code by keeping functions pure (no side effects) when possible.
+2. Use dependency injection for external services and mock dependencies in tests.

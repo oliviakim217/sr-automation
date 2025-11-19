@@ -1,0 +1,124 @@
+---
+alwaysApply: true
+---
+
+## **Project-Specific Rules: SR Automation Service**
+
+### Project Overview
+
+1. **Purpose**: Internal service that receives inputs from a bot, processes them through a validation/transformation/enrichment pipeline, creates Service Requests in ServiceNow via API, and returns responses.
+2. **Scope**: Backend API service only - no frontend required.
+3. **Users**: IT Ops team members will be the primary users of this service (via bot integration).
+4. **Phase**: Starting with one endpoint (POC), will expand later.
+5. **Environment**: Currently running as POC on personal laptop (Windows), will be deployed to the company internal network later.
+
+### Technology Stack
+
+1. **Python Version**: Python 3.11
+2. **Framework**: FastAPI for REST API endpoints
+3. **External Integration**: ServiceNow API (REST)
+4. **Platform**: Windows with PowerShell
+5. **Dependencies**: Use `requirements.txt` for all packages (FastAPI, requests, pydantic, etc.)
+
+### ServiceNow Integration
+
+1. **ServiceNow Instance**: `nowlearning-nlinst03457694-2wnyz-0001.lab.service-now.com` (Lab instance for testing)
+2. **Authentication**: Use ServiceNow API authentication (username/password or OAuth token) - store in environment variables, never in code.
+3. **API Endpoint**: POST request to ServiceNow API to create service requests (table: `sc_request` or similar).
+4. **Error Handling**: Handle ServiceNow API errors gracefully - network timeouts, authentication failures, invalid data, API rate limits.
+5. **Response Handling**: Capture ServiceNow response (SR number, sys_id, status) and return to caller.
+
+### Data Pipeline Flow
+
+1. **Input**: Receive JSON payload from bot via FastAPI endpoint.
+2. **Validate**: Validate required fields, data types, formats using validation module.
+3. **Transform**: Cleanse data (remove whitespace, normalize formats, fix data types).
+4. **Enrich**: Add metadata (timestamps, caller info, priority if not provided, default values).
+5. **Process**: Format data for ServiceNow API structure and send POST request.
+6. **Output**: Return ServiceNow response (success/error) back to bot caller.
+
+### FastAPI Endpoint Structure
+
+1. **Single Endpoint**: Start with one POST endpoint (e.g., `/api/create-service-request`).
+2. **Request Model**: Use Pydantic models for request validation.
+3. **Response Model**: Use Pydantic models for consistent response format.
+4. **Error Responses**: Return proper HTTP status codes (200, 400, 500) with error messages.
+5. **Example Structure**:
+   ```python
+   @app.post("/api/create-service-request")
+   async def create_service_request(request: ServiceRequestInput):
+       # Validate → Transform → Enrich → Process → Return
+   ```
+
+### Environment Configuration
+
+1. **Development (POC)**: 
+   - ServiceNow URL: `nowlearning-nlinst03457694-2wnyz-0001.lab.service-now.com`
+   - Use `.env` file for ServiceNow credentials (username, password, or OAuth token)
+   - Config file: `configs/dev/config.yaml`
+2. **Production (Future)**:
+   - Will use production ServiceNow instance URL
+   - Config file: `configs/prod/config.yaml`
+   - Environment variables for all secrets
+3. **Config Files**: Use YAML configs for ServiceNow table mappings, field mappings, default values, business rules.
+
+### Domain-Specific Naming Conventions
+
+1. **Service Request Fields**: Use ServiceNow field names or clear mappings:
+   - `sr_number` or `sr_id` for Service Request number
+   - `sr_short_description` for request description
+   - `sr_caller` or `caller_id` for requester
+   - `sr_category` for request category
+   - `sr_subcategory` for request subcategory
+2. **Function Prefixes**: Use `sr_` prefix for Service Request related functions:
+   - `sr_validate()`, `sr_transform()`, `sr_enrich()`, `sr_create()`
+3. **Variables**: Use descriptive names matching ServiceNow terminology where applicable.
+
+### API Request/Response Format
+
+1. **Request Format**: JSON payload from bot (structure to be defined based on bot output).
+2. **Response Format**: Consistent JSON response:
+   ```json
+   {
+     "status": "success" | "error",
+     "message": "Service request created successfully",
+     "data": {
+       "sr_number": "SR0012345",
+       "sys_id": "abc123...",
+       "status": "New"
+     }
+   }
+   ```
+3. **Error Response**: Include error code, message, and details (without exposing internal system info).
+
+### Testing Strategy
+
+1. **Unit Tests**: Test validation, transformation, enrichment functions independently.
+2. **Integration Tests**: Test ServiceNow API integration with test instance.
+3. **Test Data**: Create sample bot payload files in `tests/test_data/` directory.
+4. **Sample Bot Data**: Create realistic sample datasets that simulate what the bot might send. Include various scenarios (valid data, missing fields, invalid formats, edge cases) to test all code paths.
+5. **Mock ServiceNow**: Consider mocking ServiceNow API responses for faster development/testing.
+6. **Command Line Testing**: Support testing via curl or PowerShell:
+   ```powershell
+   curl -X POST http://localhost:8000/api/create-service-request -H "Content-Type: application/json" -d @test_data.json
+   ```
+
+### Logging & Monitoring
+
+1. **Log All Steps**: Log each stage of the pipeline (validate, transform, enrich, API call, response).
+2. **Log ServiceNow Interactions**: Log API requests/responses (without sensitive data like passwords).
+3. **Include Context**: Log SR numbers, caller info, timestamps for troubleshooting.
+4. **Log Levels**: Use DEBUG for detailed pipeline steps, INFO for successful operations, ERROR for failures.
+
+### Security Considerations
+
+1. **Credentials**: Never hardcode ServiceNow credentials - use environment variables.
+2. **Input Validation**: Validate and sanitize all inputs from bot to prevent injection attacks.
+3. **API Security**: Use HTTPS for ServiceNow API calls, validate SSL certificates.
+4. **Error Messages**: Don't expose internal system details in error responses to bot.
+
+### Future Expansion
+
+1. **Additional Endpoints**: Plan for endpoints like update SR, query SR, close SR.
+2. **Multiple Bot Support**: Design to handle inputs from different bots if needed.
+3. **Scalability**: Design code structure to easily add new endpoints without major refactoring.
