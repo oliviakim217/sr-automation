@@ -1,0 +1,71 @@
+---
+alwaysApply: true
+---
+
+## **Cursor IDE-Specific Rules**
+
+### Code Generation Preferences
+
+1. **Follow Project Structure**: When generating code, always follow the folder structure defined in global-rules (backend/, modules/, config/, utils/, etc.).
+2. **Use Existing Patterns**: Before creating new code, check existing modules for patterns and follow the same structure.
+3. **Complete Implementations**: Generate complete, working code with proper error handling, not just stubs or placeholders.
+4. **Include Comments**: Add clear comments explaining what each section does, especially for complex logic.
+
+### Context Awareness
+
+1. **Prioritize Project Rules**: Always reference project-rules.mdc for ServiceNow integration specifics, FastAPI patterns, and domain naming conventions.
+2. **Consider Pipeline Flow**: When generating validation/transformation/enrichment code, follow the pipeline order: Validate → Transform → Enrich → Process → Output.
+3. **ServiceNow Integration**: When working with ServiceNow API code, reference the ServiceNow instance URL and authentication patterns from project-rules.
+4. **Environment Awareness**: Remember this is a Windows/PowerShell environment for POC, but code should work in both dev and prod environments.
+
+### File and Folder Handling
+
+1. **Ignore Sensitive Files**: Never include credentials, API keys, or passwords in generated code. Always use environment variables.
+2. **Config Files**: When creating config files, use YAML format and place them in `configs/dev/` or `configs/prod/` directories.
+3. **Test Data**: Place sample test data files in `tests/test_data/` directory.
+4. **Log Files**: Log files should go in `logs/` directory (already in .gitignore).
+
+### Code Suggestions
+
+1. **FastAPI Patterns**: When suggesting FastAPI code, use Pydantic models for request/response validation, proper HTTP status codes, and async/await patterns.
+2. **Error Handling**: Always include try-except blocks with specific exception types and proper logging.
+3. **Type Hints**: Include type hints for all function parameters and return values.
+4. **Docstrings**: Add docstrings to all functions, classes, and modules following the format in python-rules.
+
+### Naming Conventions
+
+1. **Service Request Functions**: Use `sr_` prefix for Service Request related functions (e.g., `sr_validate()`, `sr_transform()`, `sr_enrich()`).
+2. **Domain-Specific Names**: Use ServiceNow field naming conventions (e.g., `sr_number`, `sr_short_description`, `caller_id`).
+3. **Follow Python Conventions**: Use `snake_case` for variables/functions, `PascalCase` for classes, `UPPER_CASE` for constants.
+
+### Testing and Validation
+
+1. **Test Data**: When creating test data, include various scenarios: valid data, missing fields, invalid formats, edge cases.
+2. **Sample Bot Payloads**: Create realistic sample bot payload files that simulate what the bot might send.
+3. **PowerShell Examples**: When providing command-line examples, use PowerShell syntax for Windows environment.
+
+### Code Review Suggestions
+
+1. **Security First**: Flag any hardcoded credentials, API keys, or sensitive data.
+2. **Error Handling**: Ensure all external API calls have proper error handling and retry logic.
+3. **Logging**: Verify that important operations are logged with appropriate log levels.
+4. **Validation**: Check that input validation is performed before processing data.
+
+### Documentation
+
+1. **Inline Comments**: Add comments explaining complex logic, especially for ServiceNow API interactions.
+2. **Function Documentation**: Include docstrings with Args, Returns, and Raises sections.
+3. **Usage Examples**: When creating new modules, include example usage in comments or docstrings.
+
+### Code Organization
+
+1. **Separation of Concerns**: Keep validation, transformation, enrichment, and API calls in separate modules.
+2. **Modular Design**: Create reusable functions that can be easily tested independently.
+3. **Configuration-Driven**: Use config files for business rules and mappings, not hardcoded values.
+
+### When Generating Code
+
+1. **Complete Solutions**: Generate full implementations, not just function signatures.
+2. **Production-Ready**: Write code that's production-ready with proper error handling, logging, and validation.
+3. **Testable Code**: Structure code so it can be easily tested with unit tests and integration tests.
+4. **Environment Variables**: Always use environment variables for ServiceNow credentials and URLs.
