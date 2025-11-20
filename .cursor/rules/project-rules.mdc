@@ -22,7 +22,7 @@ alwaysApply: true
 
 ### ServiceNow Integration
 
-1. **ServiceNow Instance**: `nowlearning-nlinst03457694-2wnyz-0001.lab.service-now.com` (Lab instance for testing)
+1. **ServiceNow Instance**: Use environment variables for ServiceNow instance URL (dev/prod instances).
 2. **Authentication**: Use ServiceNow API authentication (username/password or OAuth token) - store in environment variables, never in code.
 3. **API Endpoint**: POST request to ServiceNow API to create service requests (table: `sc_request` or similar).
 4. **Error Handling**: Handle ServiceNow API errors gracefully - network timeouts, authentication failures, invalid data, API rate limits.
@@ -53,14 +53,12 @@ alwaysApply: true
 ### Environment Configuration
 
 1. **Development (POC)**: 
-   - ServiceNow URL: `nowlearning-nlinst03457694-2wnyz-0001.lab.service-now.com`
-   - Use `.env` file for ServiceNow credentials (username, password, or OAuth token)
-   - Config file: `configs/dev/config.yaml`
+   - Use `.env` file for ServiceNow instance URL and credentials (username, password, or OAuth token)
+   - Config file: `configs/dev/config.yaml` (reads from environment variables)
 2. **Production (Future)**:
-   - Will use production ServiceNow instance URL
-   - Config file: `configs/prod/config.yaml`
-   - Environment variables for all secrets
-3. **Config Files**: Use YAML configs for ServiceNow table mappings, field mappings, default values, business rules.
+   - Use environment variables for production ServiceNow instance URL and all secrets
+   - Config file: `configs/prod/config.yaml` (reads from environment variables)
+3. **Config Files**: Use YAML configs for ServiceNow table mappings, field mappings, default values, business rules. Environment-specific values (URLs, credentials) should come from `.env` file, not hardcoded in config files.
 
 ### Domain-Specific Naming Conventions
 

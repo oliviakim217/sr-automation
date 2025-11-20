@@ -1,0 +1,33 @@
+# Production Configuration
+# Config schema version - validates against CONFIG_VERSION environment variable
+config_version: "1.0.0"
+
+# Data Flow Configuration
+# Source: Where data comes from | Target: Where data goes
+data_flow:
+  source:
+    type: "bot_api"
+    endpoint: "/api/create-service-request"
+  target:
+    type: "servicenow_api"
+    instance: ""  # Loaded from SERVICENOW_INSTANCE_URL env var at runtime
+    table: "sc_request"
+
+# ServiceNow Configuration
+servicenow:
+  instance_url: ""  # Loaded from SERVICENOW_INSTANCE_URL env var at runtime
+  api_version: "v1"
+  table: "sc_request"
+  
+# Application Settings
+app:
+  name: "SR Automation Service"
+  version: "1.0.0"  # Application version (separate from config_version)
+  environment: "prod"
+  
+# Logging Configuration
+logging:
+  level: "INFO"  # INFO level for production
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+
