@@ -27,6 +27,7 @@ alwaysApply: true
 3. **API Endpoint**: POST request to ServiceNow API to create service requests (table: `sc_request` or similar).
 4. **Error Handling**: Handle ServiceNow API errors gracefully - network timeouts, authentication failures, invalid data, API rate limits.
 5. **Response Handling**: Capture ServiceNow response (SR number, sys_id, status) and return to caller.
+6. **ServiceNow Documentation**: Follow the official ServiceNow API documentation "https://www.servicenow.com/docs/bundle/xanadu-api-reference/page/integrate/inbound-rest/concept/c_TableAPI.htm"
 
 ### Data Pipeline Flow
 
