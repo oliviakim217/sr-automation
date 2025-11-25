@@ -15,6 +15,16 @@ def load_config(config_path: str) -> Dict[str, Any]:
     """
     Load configuration from YAML file.
     
+    Expected config structure:
+    - config_version: Version string (e.g., "1.0.0")
+    - servicenow: ServiceNow API configuration
+      - instance_url: ServiceNow instance URL (loaded from env var)
+      - api_path: API base path (e.g., "/api/now/table")
+      - query_params: Default query parameters
+      - headers: HTTP headers for API requests
+    - app: Application settings (name, version, environment)
+    - logging: Logging configuration (level, format, file)
+    
     Args:
         config_path: Path to config YAML file (e.g., "configs/dev/config.yaml")
         

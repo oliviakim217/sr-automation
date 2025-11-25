@@ -2,22 +2,20 @@
 # Config schema version - validates against CONFIG_VERSION environment variable
 config_version: "1.0.0"
 
-# Data Flow Configuration
-# Source: Where data comes from | Target: Where data goes
-data_flow:
-  source:
-    type: "bot_api"
-    endpoint: "/api/create-service-request"
-  target:
-    type: "servicenow_api"
-    instance: ""  # Loaded from SERVICENOW_INSTANCE_URL env var at runtime
-    table: "sc_request"
-
-# ServiceNow Configuration
 servicenow:
   instance_url: ""  # Loaded from SERVICENOW_INSTANCE_URL env var at runtime
-  api_version: "v1"
-  table: "sc_request"
+  # ServiceNow Table API endpoint format: /api/now/table/{table_name}
+  api_path: "/api/now/table"  # Base path for Table API (no version in path)
+  table: "sc_request"  # Default table name
+  # Query parameters for Table API
+  query_params:
+    sysparm_limit: 10  # Default limit for records returned
+    sysparm_offset: 0  # Default offset for pagination
+    sysparm_display_value: false  # Return sys_id or display values for reference fields
+  # API request headers
+  # For GET requests, only Accept header is required per ServiceNow Table API
+  headers:
+    Accept: "application/json"
   
 # Application Settings
 app:
