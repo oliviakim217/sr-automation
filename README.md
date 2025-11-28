@@ -11,11 +11,13 @@ A Python FastAPI backend for creating Service Requests in ServiceNow.
 ## Setup
 
 1. Create a `.env` file in the project root with your ServiceNow credentials:
+   - Copy `.env.sample` to `.env`
+   - Fill in your actual ServiceNow credentials
    ```
    SERVICENOW_INSTANCE_URL=your-instance.service-now.com
    SERVICENOW_USERNAME=your_username
    SERVICENOW_PASSWORD=your_password
-   ENVIRONMENT=dev
+   SERVICENOW_ENVIRONMENT=dev
    ```
 
 2. Install dependencies: `pip install -r requirements.txt`

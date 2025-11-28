@@ -2,17 +2,21 @@
 # Python 3.11
 
 # Web Framework
-fastapi>=0.104.0
-uvicorn[standard]>=0.24.0
+# FastAPI 0.100-0.104 range: Stable, well-tested, suitable for banking environments
+fastapi>=0.100.0,<0.105.0
+uvicorn[standard]>=0.24.0,<0.30.0
 
 # HTTP Client
-requests>=2.31.0
+# Requests 2.31+ includes critical security patches (CVE-2023-32681)
+requests>=2.31.0,<3.0.0
 
 # Data Validation
-pydantic>=2.5.0
+# Pydantic 2.4+ is stable and compatible with FastAPI 0.100+
+pydantic>=2.4.0,<2.6.0
 
 # Configuration Management
-pyyaml>=6.0.1
+# PyYAML 6.0+ includes security fixes (CVE-2020-14343)
+pyyaml>=6.0.1,<7.0.0
 
 # Environment Variables
 python-dotenv>=1.0.0

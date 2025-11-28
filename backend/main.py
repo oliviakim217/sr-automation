@@ -24,29 +24,29 @@ env_path = Path(__file__).parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
 # Determine environment
-environment = os.getenv("ENVIRONMENT", "dev").lower()
+servicenow_environment = os.getenv("SERVICENOW_ENVIRONMENT", "dev").lower()
 
 # Load configuration
-config_path = f"configs/{environment}/config.yaml"
-config = load_config(config_path)
+sr_config_path = f"configs/{servicenow_environment}/config.yaml"
+sr_config = load_config(sr_config_path)
 
 # Set up logger
-logger = setup_logger(config)
+logger = setup_logger(sr_config)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Handle application startup and shutdown."""
-    logger.info(f"Starting {config.get('app', {}).get('name', 'SR Automation Service')}")
-    logger.info(f"Environment: {environment}")
+    logger.info(f"Starting {sr_config.get('app', {}).get('name', 'SR Automation Service')}")
+    logger.info(f"Environment: {servicenow_environment}")
     yield
     logger.info("Shutting down")
 
 
 # Create FastAPI app
 app = FastAPI(
-    title=config.get("app", {}).get("name", "SR Automation Service"),
-    version=config.get("app", {}).get("version", "1.0.0"),
+    title=sr_config.get("app", {}).get("name", "SR Automation Service"),
+    version=sr_config.get("app", {}).get("version", "1.0.0"),
     description="Backend API service for querying ServiceNow tables",
     lifespan=lifespan
 )
@@ -56,9 +56,9 @@ app = FastAPI(
 async def root():
     """Root endpoint - API information."""
     return {
-        "service": config.get("app", {}).get("name", "SR Automation Service"),
-        "version": config.get("app", {}).get("version", "1.0.0"),
-        "environment": environment,
+        "service": sr_config.get("app", {}).get("name", "SR Automation Service"),
+        "version": sr_config.get("app", {}).get("version", "1.0.0"),
+        "environment": servicenow_environment,
         "status": "running"
     }
 
@@ -98,22 +98,22 @@ async def query_table(
         from backend.modules import servicenow
         
         servicenow_response = servicenow.query_table(
-            config=config,
+            sr_config=sr_config,
             table_name=table_name,
             limit=limit
         )
         
         # Extract records from ServiceNow response
-        records = servicenow_response.get("result", [])
+        servicenow_records = servicenow_response.get("result", [])
         
-        logger.info(f"Successfully retrieved {len(records)} records from {table_name}")
+        logger.info(f"Successfully retrieved {len(servicenow_records)} records from {table_name}")
         
         return QueryResponse(
             status="success",
-            message=f"Successfully retrieved {len(records)} records from {table_name}",
+            message=f"Successfully retrieved {len(servicenow_records)} records from {table_name}",
             table_name=table_name,
-            count=len(records),
-            records=records
+            count=len(servicenow_records),
+            records=servicenow_records
         )
         
     except ValueError as e:

@@ -15,10 +15,15 @@ alwaysApply: true
 ### Technology Stack
 
 1. **Python Version**: Python 3.11
-2. **Framework**: FastAPI for REST API endpoints
-3. **External Integration**: ServiceNow API (REST)
-4. **Platform**: Windows with PowerShell
-5. **Dependencies**: Use `requirements.txt` for all packages (FastAPI, requests, pydantic, etc.)
+2. **Framework**: FastAPI >=0.100.0,<0.105.0 (stable, banking-compatible version range)
+3. **Server**: Uvicorn[standard] >=0.24.0,<0.30.0 (ASGI server for FastAPI)
+4. **HTTP Client**: Requests >=2.31.0,<3.0.0 (includes critical security patches)
+5. **Data Validation**: Pydantic >=2.4.0,<2.6.0 (stable, compatible with FastAPI 0.100+)
+6. **Configuration**: PyYAML >=6.0.1,<7.0.0 (includes security fixes)
+7. **Environment Variables**: python-dotenv >=1.0.0
+8. **External Integration**: ServiceNow Table API (REST) - Official documentation: https://www.servicenow.com/docs/bundle/xanadu-api-reference/page/integrate/inbound-rest/concept/c_TableAPI.html
+9. **Platform**: Windows with PowerShell
+10. **Dependencies**: All packages with version constraints specified in `requirements.txt`
 
 ### ServiceNow Integration
 

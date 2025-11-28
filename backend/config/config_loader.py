@@ -41,8 +41,8 @@ def load_config(config_path: str) -> Dict[str, Any]:
         raise FileNotFoundError(f"Config file not found: {config_path}")
     
     # Load YAML config
-    with open(config_file, 'r', encoding='utf-8') as file:
-        config = yaml.safe_load(file)
+    with open(config_file, 'r', encoding='utf-8') as yaml_file_handle:
+        config = yaml.safe_load(yaml_file_handle)
     
     if not config:
         raise ValueError(f"Config file is empty: {config_path}")
