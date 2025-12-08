@@ -12,12 +12,6 @@ alwaysApply: true
 4. **Include Comments**: Add clear comments explaining what each section does, especially for complex logic.
 5. **Guardrail**: Do not go overboard. Keep the code simple and minimal.
 
-### Context Awareness
-
-1. **Prioritize Project Rules**: Always reference project-rules.mdc for ServiceNow integration specifics, FastAPI patterns, and domain naming conventions.
-2. **Consider Pipeline Flow**: When generating validation/transformation/enrichment code, follow the pipeline order: Validate → Transform → Enrich → Process → Output.
-3. **ServiceNow Integration**: When working with ServiceNow API code, reference the ServiceNow instance URL and authentication patterns from project-rules.
-4. **Environment Awareness**: Remember this is a Windows/PowerShell environment for POC, but code should work in both dev and prod environments.
 
 ### File and Folder Handling
 
@@ -33,11 +27,6 @@ alwaysApply: true
 3. **Type Hints**: Include type hints for all function parameters and return values.
 4. **Docstrings**: Add docstrings to all functions, classes, and modules following the format in python-rules.
 
-### Naming Conventions
-
-1. **Service Request Functions**: Use `sr_` prefix for Service Request related functions (e.g., `sr_validate()`, `sr_transform()`, `sr_enrich()`).
-2. **Domain-Specific Names**: Use ServiceNow field naming conventions (e.g., `sr_number`, `sr_short_description`, `caller_id`).
-3. **Follow Python Conventions**: Use `snake_case` for variables/functions, `PascalCase` for classes, `UPPER_CASE` for constants.
 
 ### Testing and Validation
 
@@ -54,7 +43,7 @@ alwaysApply: true
 
 ### Documentation
 
-1. **Inline Comments**: Add comments explaining complex logic, especially for ServiceNow API interactions.
+1. **Inline Comments**: Add comments explaining complex logic.
 2. **Function Documentation**: Include docstrings with Args, Returns, and Raises sections.
 3. **Usage Examples**: When creating new modules, include example usage in comments or docstrings.
 
@@ -69,4 +58,4 @@ alwaysApply: true
 1. **Complete Solutions**: Generate full implementations, not just function signatures.
 2. **Production-Ready**: Write code that's production-ready with proper error handling, logging, and validation.
 3. **Testable Code**: Structure code so it can be easily tested with unit tests and integration tests.
-4. **Environment Variables**: Always use environment variables for ServiceNow credentials and URLs.
+4. **Environment Variables**: Always use environment variables for credentials and URLs.

@@ -1,0 +1,73 @@
+---
+alwaysApply: true
+---
+
+## **Project-Specific Rules: SR Automation Service**
+
+### Project Overview
+
+1. **Purpose**: Internal service that receives inputs from a bot, processes them through a validation/transformation/enrichment pipeline, creates Service Requests in ServiceNow via API, and returns responses.
+2. **Scope**: Backend API service only - no frontend required.
+3. **Users**: IT Ops team members will be the primary users of this service (via bot integration).
+4. **Phase**: Starting with one endpoint (POC), will expand later.
+5. **Environment**: Currently running as POC on personal laptop (Windows), will be deployed to the company internal network later.
+
+
+### Technology Stack
+
+1. **Python Version**: Python 3.11
+2. **Framework**: FastAPI >=0.100.0,<0.105.0 (stable, banking-compatible version range)
+3. **Server**: Uvicorn[standard] >=0.24.0,<0.30.0 (ASGI server for FastAPI)
+4. **HTTP Client**: Requests >=2.31.0,<3.0.0 (includes critical security patches)
+5. **Data Validation**: Pydantic >=2.4.0,<2.6.0 (stable, compatible with FastAPI 0.100+)
+6. **Configuration**: PyYAML >=6.0.1,<7.0.0 (includes security fixes)
+7. **Environment Variables**: python-dotenv >=1.0.0
+8. **External Integration**: ServiceNow Table API (REST) - Official documentation: https://www.servicenow.com/docs/bundle/xanadu-api-reference/page/integrate/inbound-rest/concept/c_TableAPI.html
+9. **Platform**: Windows with PowerShell
+10. **Dependencies**: All packages with version constraints specified in `requirements.txt`
+
+
+### ServiceNow Integration  
+
+1. **ServiceNow Instance**: Use environment variables for ServiceNow instance URL (dev/prod instances).
+2. **Authentication**: Use ServiceNow API authentication (username/password or OAuth token) - store in environment variables, never in code.
+3. **API Endpoint**: POST request to ServiceNow API to create service requests (table: `sc_request` or similar).
+4. **Error Handling**: Handle ServiceNow API errors gracefully - network timeouts, authentication failures, invalid data, API rate limits.
+5. **Response Handling**: Capture ServiceNow response (SR number, sys_id, status) and return to caller.
+6. **ServiceNow Documentation**: Follow the official ServiceNow API documentation "https://www.servicenow.com/docs/bundle/xanadu-api-reference/page/integrate/inbound-rest/concept/c_TableAPI.htm"
+
+
+### Domain-Specific Naming Conventions
+
+1. **Service Request Fields**: Use ServiceNow field names or clear mappings:
+   - `sr_number` or `sr_id` for Service Request number
+   - `sr_short_description` for request description
+   - `sr_caller` or `caller_id` for requester
+   - `sr_category` for request category
+   - `sr_subcategory` for request subcategory
+2. **Function Prefixes**: Use `sr_` prefix for Service Request related functions:
+   - `sr_validate()`, `sr_transform()`, `sr_enrich()`, `sr_create()`
+3. **Variables**: Use unique, descriptive names matching ServiceNow terminology where applicable.
+
+
+### API Request/Response Format
+
+1. **Request Format**: JSON payload from bot (structure to be defined based on bot output).
+2. **Response Format**: Consistent JSON response:
+   ```json
+   {
+     "status": "success" | "error",
+     "message": "Service request created successfully",
+     "data": {
+       "sr_number": "SR0012345",
+       "sys_id": "abc123...",
+       "status": "New"
+     }
+   }
+   ```
+
+### Future Expansion
+
+1. **Additional Endpoints**: Plan for endpoints like update SR, query SR, close SR.
+2. **Multiple Bot Support**: Design to handle inputs from different bots if needed.
+3. **Scalability**: Design code structure to easily add new endpoints without major refactoring.

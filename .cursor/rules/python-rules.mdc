@@ -25,7 +25,7 @@ alwaysApply: true
    import yaml
    
    # Local
-   from backend.modules.validation import validate_data
+   from project_name.validation import validate_data
    ```
 
 ### Type Hints (Optional but Recommended)
@@ -43,6 +43,7 @@ alwaysApply: true
    ```
 3. For complex types, use `from typing import Dict, List, Optional, Union`.
 
+
 ### Virtual Environments & Dependencies
 
 1. **Always use a virtual environment** to isolate project dependencies:
@@ -59,12 +60,20 @@ alwaysApply: true
 3. Generate requirements: `pip freeze > requirements.txt`
 4. **Never commit** `venv/` folder to Git (already in .gitignore).
 
+
+### Naming Convention
+
+1. Follow Python naming conventions: `snake_case` for variables/functions, `PascalCase` for classes, `UPPER_CASE` for constants.
+2. Use specific, descriptive names. Example: Instead of `date`, use `dt_txn` (transaction date) or `dt_created` (creation date). Align with domain standards (i.e. banking).
+3. Prefix private/internal functions with underscore: `def _my_internal_function():` - indicates it's not meant to be called from outside the module.
+
+
+
 ### Functions and Methods
 
 1. **Single Responsibility**: Each function should do one thing well.
 2. **Function Length**: Keep functions under 50 lines if possible. If longer, consider breaking into smaller functions.
-3. **Function Names**: Use descriptive verbs: `validate_input()`, `process_data()`, `calculate_total()`.
-4. **Return Early**: Use early returns to reduce nesting:
+3. **Return Early**: Use early returns to reduce nesting:
    ```python
    def validate_user(user_data: dict) -> bool:
        if not user_data:
@@ -94,6 +103,7 @@ alwaysApply: true
    # File automatically closed
    ```
 2. Use context managers for database connections if your library supports them.
+
 
 ### Docstrings
 
@@ -131,6 +141,7 @@ alwaysApply: true
 2. **Don't use bare `except:`** - always specify exception types.
 3. **Use `finally`** for cleanup code that must run.
 
+
 ### String Formatting
 
 1. Use f-strings (Python 3.6+) for string formatting:
@@ -142,6 +153,7 @@ alwaysApply: true
    ```
 2. Avoid `.format()` and `%` formatting unless necessary for compatibility.
 
+
 ### Constants and Configuration
 
 1. Define constants at module level using `UPPER_CASE`:
@@ -150,7 +162,7 @@ alwaysApply: true
    DEFAULT_TIMEOUT = 30
    API_BASE_URL = "https://api.example.com"
    ```
-2. Store constants in a separate `constants.py` file (as per global rules).
+2. Store constants in a separate `constants.py` file.
 3. Use environment variables for sensitive or environment-specific values.
 
 ### Security Best Practices
@@ -177,10 +189,7 @@ alwaysApply: true
 2. **Avoid premature optimization** - write clear code first, optimize if needed.
 3. **Use built-in functions** when possible (`sum()`, `max()`, `min()`, `any()`, `all()`).
 
-### Common Python Patterns
 
-1. **Guard clauses**: Check conditions early and return to reduce nesting.
-2. **Use `zip()`** to iterate over multiple lists: `for name, age in zip(names, ages):`
 
 ### Testing Support
 
