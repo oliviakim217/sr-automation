@@ -1,5 +1,9 @@
 ---
 alwaysApply: true
+title: "Cursor IDE-Specific Rules"
+description: "Cursor IDE code generation preferences, context awareness, and IDE-specific guidelines"
+version: "1.0.0"
+category: "ide-rules"
 ---
 
 ## **Cursor IDE-Specific Rules**

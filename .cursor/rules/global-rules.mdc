@@ -1,5 +1,9 @@
 ---
 alwaysApply: true
+title: "Global Rules"
+description: "General programming best practices, production considerations, and universal coding standards"
+version: "1.0.0"
+category: "general-rules"
 ---
 
 ## **Global Rules**

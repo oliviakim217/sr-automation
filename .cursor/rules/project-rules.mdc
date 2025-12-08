@@ -1,5 +1,9 @@
 ---
 alwaysApply: true
+title: "General Project Rules - FastAPI Backend"
+description: "Project structure, FastAPI patterns, environment configuration, and data pipeline standards"
+version: "1.0.0"
+category: "project-rules"
 ---
 
 ## **Project Rules - FastAPI Backend**

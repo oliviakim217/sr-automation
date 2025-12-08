@@ -1,5 +1,9 @@
 ---
 alwaysApply: true
+title: "SR Automation Service - Project-Specific Rules"
+description: "ServiceNow integration, SR-specific naming conventions, and domain-specific patterns for SR Automation project"
+version: "1.0.0"
+category: "project-specific"
 ---
 
 ## **Project-Specific Rules: SR Automation Service**

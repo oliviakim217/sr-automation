@@ -1,5 +1,9 @@
 ---
 alwaysApply: true
+title: "Python Best Practices"
+description: "Python coding standards, style guidelines, and best practices for Python development"
+version: "1.0.0"
+category: "language-rules"
 ---
 
 ## **Python Best Practices**
@@ -33,13 +37,13 @@ alwaysApply: true
 1. Use type hints for function parameters and return values to make code more readable and catch errors early.
 2. Basic examples:
    ```python
-   def process_data(input_data: dict) -> dict:
-       """Process input data and return result."""
-       return {"status": "success", "data": input_data}
-   
-   def calculate_total(items: list[float]) -> float:
-       """Calculate sum of items."""
-       return sum(items)
+   def txn_process_payload(bank_input_payload: dict) -> dict:
+    """Process input data and return result."""
+       return {"status": "success", "txn_data": bank_input_payload}
+
+   def txn_calculate_aggregate(ledger_amounts: list[float]) -> float:
+        """Calculate sum of prices."""
+       return sum(ledger_amounts)
    ```
 3. For complex types, use `from typing import Dict, List, Optional, Union`.
 
@@ -75,10 +79,10 @@ alwaysApply: true
 2. **Function Length**: Keep functions under 50 lines if possible. If longer, consider breaking into smaller functions.
 3. **Return Early**: Use early returns to reduce nesting:
    ```python
-   def validate_user(user_data: dict) -> bool:
-       if not user_data:
+   def usr_validate_profile(customer_profile_dict: dict) -> bool:
+       if not customer_profile_dict:
            return False
-       if "email" not in user_data:
+       if "email" not in customer_profile_dict:
            return False
        return True
    ```
@@ -91,15 +95,15 @@ alwaysApply: true
    user_emails = {user["id"]: user["email"] for user in users}
    ```
 2. **Avoid** overly complex comprehensions - use a regular loop if it's clearer.
-3. **Dictionary operations**: Use `.get()` for safe access: `value = my_dict.get("key", "default")`
+3. **Dictionary operations**: Use `.get()` for safe access: `config_value = config_dict.get("key", "default")`
 4. **Iterate properly**: Use `.items()` for dictionaries, `enumerate()` when you need index and value.
 
 ### Context Managers & File Operations
 
 1. Always use `with` statements for file operations and resources that need cleanup:
    ```python
-   with open("data.json", "r") as file:
-       data = json.load(file)
+   with open("customer_data.json", "r") as json_file_handle:
+       customer_data_dict = json.load(json_file_handle)
    # File automatically closed
    ```
 2. Use context managers for database connections if your library supports them.
@@ -130,7 +134,7 @@ alwaysApply: true
 1. **Catch specific exceptions** first, then general ones:
    ```python
    try:
-       result = process_data(data)
+       processed_result = process_data(input_data)
    except ValueError as e:
        logger.error(f"Invalid data: {e}")
    except FileNotFoundError as e:
@@ -156,14 +160,8 @@ alwaysApply: true
 
 ### Constants and Configuration
 
-1. Define constants at module level using `UPPER_CASE`:
-   ```python
-   MAX_RETRY_ATTEMPTS = 3
-   DEFAULT_TIMEOUT = 30
-   API_BASE_URL = "https://api.example.com"
-   ```
-2. Store constants in a separate `constants.py` file.
-3. Use environment variables for sensitive or environment-specific values.
+1. Store constants in a separate `constants.py` file.
+2. Use environment variables for sensitive or environment-specific values.
 
 ### Security Best Practices
 
