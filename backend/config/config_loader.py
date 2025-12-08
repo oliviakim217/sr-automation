@@ -1,5 +1,5 @@
 """
-Configuration loader - Simple YAML config loader with version validation.
+Configuration loader - Loads and merges multiple YAML config files.
 """
 
 import os
@@ -11,37 +11,17 @@ from typing import Dict, Any
 SUPPORTED_CONFIG_VERSIONS = ["1.0.0"]
 
 
-def load_config(config_path: str) -> Dict[str, Any]:
+def _load_single_config(config_path: Path) -> Dict[str, Any]:
     """
-    Load configuration from YAML file.
-    
-    Expected config structure:
-    - config_version: Version string (e.g., "1.0.0")
-    - servicenow: ServiceNow API configuration
-      - instance_url: ServiceNow instance URL (loaded from env var)
-      - api_path: API base path (e.g., "/api/now/table")
-      - query_params: Default query parameters
-      - headers: HTTP headers for API requests
-    - app: Application settings (name, version, environment)
-    - logging: Logging configuration (level, format, file)
+    Load a single YAML config file.
     
     Args:
-        config_path: Path to config YAML file (e.g., "configs/dev/config.yaml")
+        config_path: Path to config YAML file
         
     Returns:
         Dictionary containing configuration
-        
-    Raises:
-        FileNotFoundError: If config file doesn't exist
-        ValueError: If config version is unsupported
     """
-    config_file = Path(config_path)
-    
-    if not config_file.exists():
-        raise FileNotFoundError(f"Config file not found: {config_path}")
-    
-    # Load YAML config
-    with open(config_file, 'r', encoding='utf-8') as yaml_file_handle:
+    with open(config_path, 'r', encoding='utf-8') as yaml_file_handle:
         config = yaml.safe_load(yaml_file_handle)
     
     if not config:
@@ -55,10 +35,67 @@ def load_config(config_path: str) -> Dict[str, Any]:
             f"Supported versions: {SUPPORTED_CONFIG_VERSIONS}"
         )
     
+    return config
+
+
+def _merge_configs(configs: list[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Merge multiple config dictionaries, later configs override earlier ones.
+    
+    Args:
+        configs: List of config dictionaries to merge
+        
+    Returns:
+        Merged configuration dictionary
+    """
+    merged_config = {}
+    for config in configs:
+        merged_config.update(config)
+    return merged_config
+
+
+def load_config(config_dir: str) -> Dict[str, Any]:
+    """
+    Load and merge all YAML config files from a directory.
+    
+    Config files are loaded in alphabetical order and merged. Later files override
+    earlier ones for duplicate keys. Expected config files:
+    - servicenow.yaml: ServiceNow API configuration
+    - app.yaml: Application settings
+    - logging.yaml: Logging configuration
+    
+    Args:
+        config_dir: Path to config directory (e.g., "configs/dev")
+        
+    Returns:
+        Dictionary containing merged configuration
+        
+    Raises:
+        FileNotFoundError: If config directory doesn't exist
+    """
+    config_directory = Path(config_dir)
+    
+    if not config_directory.exists():
+        raise FileNotFoundError(f"Config directory not found: {config_dir}")
+    
+    # Load all YAML files in the directory
+    config_files = sorted(config_directory.glob("*.yaml"))
+    
+    if not config_files:
+        raise ValueError(f"No config files found in: {config_dir}")
+    
+    configs = []
+    for config_file in config_files:
+        config = _load_single_config(config_file)
+        configs.append(config)
+    
+    # Merge all configs
+    merged_config = _merge_configs(configs)
+    
     # Load ServiceNow URL from environment variable
-    if "servicenow" in config:
+    if "servicenow" in merged_config:
         instance_url = os.getenv("SERVICENOW_INSTANCE_URL", "")
         if instance_url:
-            config["servicenow"]["instance_url"] = instance_url
+            merged_config["servicenow"]["instance_url"] = instance_url
     
-    return config
+    return merged_config

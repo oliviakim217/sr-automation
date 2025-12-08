@@ -27,8 +27,8 @@ load_dotenv(dotenv_path=env_path)
 servicenow_environment = os.getenv("SERVICENOW_ENVIRONMENT", "dev").lower()
 
 # Load configuration
-sr_config_path = f"configs/{servicenow_environment}/config.yaml"
-sr_config = load_config(sr_config_path)
+sr_config_dir = f"configs/{servicenow_environment}"
+sr_config = load_config(sr_config_dir)
 
 # Set up logger
 logger = setup_logger(sr_config)
