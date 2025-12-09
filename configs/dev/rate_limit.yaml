@@ -1,0 +1,7 @@
+# Rate Limiting Configuration
+config_version: "1.0.0"
+
+rate_limit:
+  enabled: true
+  max_calls_per_day: 1000
+

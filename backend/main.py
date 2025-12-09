@@ -9,13 +9,14 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import requests
 
 from backend.config import load_config
 from backend.utils.logger import setup_logger
+from backend.utils.rate_limiter import create_rate_limiter
 from backend.modules.models import QueryResponse
 
 
@@ -32,6 +33,16 @@ sr_config = load_config(sr_config_dir)
 
 # Set up logger
 logger = setup_logger(sr_config)
+
+# Set up rate limiter
+rate_limit_config = sr_config.get("rate_limit", {})
+rate_limiter = None
+if rate_limit_config.get("enabled", False):
+    rate_limiter = create_rate_limiter({"rate_limit": rate_limit_config})
+    excluded_paths = rate_limit_config.get("excluded_paths", [])
+    logger.info(f"Rate limiting enabled: {rate_limit_config.get('max_calls_per_day')} calls/day per IP")
+else:
+    logger.info("Rate limiting disabled")
 
 
 @asynccontextmanager
@@ -71,6 +82,7 @@ async def health_check():
 
 @app.get("/api/query/{table_name}", response_model=QueryResponse)
 async def query_table(
+    request: Request,
     table_name: str,
     limit: int = 10
 ):
@@ -78,12 +90,17 @@ async def query_table(
     Query ServiceNow table to retrieve records.
     
     Args:
+        request: FastAPI request object (for rate limiting)
         table_name: ServiceNow table name (e.g., "sc_request")
         limit: Maximum number of records to return (default: 10)
         
     Returns:
         QueryResponse with records from ServiceNow
     """
+    # Check rate limit
+    if rate_limiter:
+        rate_limiter.check_rate_limit(request)
+    
     logger.info(f"Query request for table: {table_name}, limit: {limit}")
     
     # Validate inputs

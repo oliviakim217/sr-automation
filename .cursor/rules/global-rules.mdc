@@ -15,7 +15,7 @@ category: "general-rules"
 3. Think in layers - separate concerns (data, business logic, presentation).
 4. Always validate inputs. Use if-else statements and multiple validation checks.
 5. Add comments on each section explaining what it does and why.
-6. Have a max limiter (ceiling) for anything that could grow infinitely. Example: Log files older than 90 days should be zipped or deleted.
+6. Have a max limiter (ceiling) for anything that could grow infinitely. Examples: Log files older than 90 days should be zipped or deleted. API rate limiting (e.g., 1000 calls per day per IP) to prevent abuse.
 7. Use GitHub to version control all code with meaningful commit messages.
 8. Write code that works in both dev (development/testing) and prod (production/live) environments.
 
