@@ -27,9 +27,9 @@ load_dotenv(dotenv_path=env_path)
 # Determine environment
 servicenow_environment = os.getenv("SERVICENOW_ENVIRONMENT", "dev").lower()
 
-# Load configuration
-sr_config_dir = f"configs/{servicenow_environment}"
-sr_config = load_config(sr_config_dir)
+# Load configuration (resolve path relative to main.py file location)
+sr_config_dir = Path(__file__).parent.parent / "configs" / servicenow_environment
+sr_config = load_config(str(sr_config_dir))
 
 # Set up logger
 logger = setup_logger(sr_config)
@@ -86,17 +86,7 @@ async def query_table(
     table_name: str,
     limit: int = 10
 ):
-    """
-    Query ServiceNow table to retrieve records.
-    
-    Args:
-        request: FastAPI request object (for rate limiting)
-        table_name: ServiceNow table name (e.g., "sc_request")
-        limit: Maximum number of records to return (default: 10)
-        
-    Returns:
-        QueryResponse with records from ServiceNow
-    """
+    """Query ServiceNow table to retrieve records."""
     # Check rate limit
     if rate_limiter:
         rate_limiter.check_rate_limit(request)

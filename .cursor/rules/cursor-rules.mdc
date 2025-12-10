@@ -13,7 +13,7 @@ category: "ide-rules"
 1. **Follow Project Structure**: When generating code, always follow the folder structure defined in global-rules (backend/, modules/, config/, utils/, etc.).
 2. **Use Existing Patterns**: Before creating new code, check existing modules for patterns and follow the same structure.
 3. **Complete Implementations**: Generate complete, working code with proper error handling, not just stubs or placeholders.
-4. **Include Comments**: Add clear comments explaining what each section does, especially for complex logic.
+4. **Include Comments**: Add clear but concise comments explaining what each section does, especially for complex logic.
 5. **Guardrail**: Do not go overboard. Keep the code simple and minimal.
 
 
@@ -29,7 +29,7 @@ category: "ide-rules"
 1. **FastAPI Patterns**: When suggesting FastAPI code, use Pydantic models for request/response validation, proper HTTP status codes, and async/await patterns.
 2. **Error Handling**: Always include try-except blocks with specific exception types and proper logging.
 3. **Type Hints**: Include type hints for all function parameters and return values.
-4. **Docstrings**: Add docstrings to all functions, classes, and modules following the format in python-rules.
+4. **Docstrings**: Use simple one-line docstrings. Only add detailed Args/Returns sections for complex functions.
 
 
 ### Testing and Validation
@@ -47,7 +47,7 @@ category: "ide-rules"
 
 ### Documentation
 
-1. **Inline Comments**: Add comments explaining complex logic.
+1. **Inline Comments**: Add short comments explaining complex logic.
 2. **Function Documentation**: Include docstrings with Args, Returns, and Raises sections.
 3. **Usage Examples**: When creating new modules, include example usage in comments or docstrings.
 

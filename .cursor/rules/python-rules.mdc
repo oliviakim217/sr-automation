@@ -111,22 +111,12 @@ category: "language-rules"
 
 ### Docstrings
 
-1. Write docstrings for all functions, classes, and modules using triple quotes `"""`.
-2. Simple format:
+1. Use simple one-line docstrings when possible: `"""Brief description."""`
+2. Only add detailed Args/Returns/Raises sections for complex functions that need explanation.
+3. Example:
    ```python
    def process_transaction(transaction_data: dict) -> dict:
-       """
-       Process a financial transaction.
-       
-       Args:
-           transaction_data: Dictionary containing transaction details
-           
-       Returns:
-           Dictionary with processing result and status
-           
-       Raises:
-           ValueError: If transaction data is invalid
-       """
+       """Process a financial transaction."""
    ```
 
 ### Error Handling (Python-Specific)
