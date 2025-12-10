@@ -12,15 +12,7 @@ SUPPORTED_CONFIG_VERSIONS = ["1.0.0"]
 
 
 def _load_single_config(config_path: Path) -> Dict[str, Any]:
-    """
-    Load a single YAML config file.
-    
-    Args:
-        config_path: Path to config YAML file
-        
-    Returns:
-        Dictionary containing configuration
-    """
+    """Load a single YAML config file."""
     with open(config_path, 'r', encoding='utf-8') as yaml_file_handle:
         config = yaml.safe_load(yaml_file_handle)
     
@@ -39,15 +31,7 @@ def _load_single_config(config_path: Path) -> Dict[str, Any]:
 
 
 def _merge_configs(configs: list[Dict[str, Any]]) -> Dict[str, Any]:
-    """
-    Merge multiple config dictionaries, later configs override earlier ones.
-    
-    Args:
-        configs: List of config dictionaries to merge
-        
-    Returns:
-        Merged configuration dictionary
-    """
+    """Merge multiple config dictionaries, later configs override earlier ones."""
     merged_config = {}
     for config in configs:
         merged_config.update(config)
@@ -55,24 +39,7 @@ def _merge_configs(configs: list[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def load_config(config_dir: str) -> Dict[str, Any]:
-    """
-    Load and merge all YAML config files from a directory.
-    
-    Config files are loaded in alphabetical order and merged. Later files override
-    earlier ones for duplicate keys. Expected config files:
-    - servicenow.yaml: ServiceNow API configuration
-    - app.yaml: Application settings
-    - logging.yaml: Logging configuration
-    
-    Args:
-        config_dir: Path to config directory (e.g., "configs/dev")
-        
-    Returns:
-        Dictionary containing merged configuration
-        
-    Raises:
-        FileNotFoundError: If config directory doesn't exist
-    """
+    """Load and merge all YAML config files from a directory."""
     config_directory = Path(config_dir)
     
     if not config_directory.exists():

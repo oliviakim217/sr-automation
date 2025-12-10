@@ -9,11 +9,7 @@ from pydantic import BaseModel, Field
 
 
 class QueryResponse(BaseModel):
-    """
-    Response model for querying ServiceNow records.
-    
-    Used for GET endpoint responses when retrieving records from ServiceNow tables.
-    """
+    """Response model for querying ServiceNow records."""
     
     # Required fields
     status: str = Field(

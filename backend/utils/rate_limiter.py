@@ -16,12 +16,7 @@ class RateLimiter:
     """
     
     def __init__(self, max_calls_per_day: int):
-        """
-        Initialize rate limiter.
-        
-        Args:
-            max_calls_per_day: Maximum calls per IP per day
-        """
+        """Initialize rate limiter."""
         self.max_calls_per_day = max_calls_per_day
         # Track calls: {ip: [(timestamp, ...), ...]}
         self.calls_by_ip: Dict[str, list] = defaultdict(list)
@@ -33,11 +28,7 @@ class RateLimiter:
         return "unknown"
     
     def check_rate_limit(self, request: Request) -> None:
-        """
-        Check if request exceeds daily rate limit.
-        
-        Raises HTTPException with 429 status if limit exceeded.
-        """
+        """Check if request exceeds daily rate limit."""
         ip_address = self._get_client_ip(request)
         now = datetime.now()
         cutoff_time = now - timedelta(days=1)

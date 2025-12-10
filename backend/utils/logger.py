@@ -12,27 +12,7 @@ from logging.handlers import RotatingFileHandler
 
 
 def setup_logger(config: dict, logger_name: str = "sr_automation") -> logging.Logger:
-    """
-    Set up logger based on configuration from YAML config file.
-    
-    Configures both file and console handlers with rotation support.
-    Creates log directory if it doesn't exist.
-    
-    Args:
-        config: Dictionary containing logging configuration (from config file)
-        logger_name: Name for the logger instance (default: "sr_automation")
-        
-    Returns:
-        Configured logger instance
-        
-    Example:
-        from backend.config import load_config
-        from backend.utils.logger import setup_logger
-        
-        config = load_config("configs/dev/config.yaml")
-        logger = setup_logger(config.get("logging", {}))
-        logger.info("Application started")
-    """
+    """Set up logger based on configuration from YAML config file."""
     # Get logging config from config dictionary
     sr_logging_config = config.get("logging", {})
     
@@ -88,16 +68,6 @@ def setup_logger(config: dict, logger_name: str = "sr_automation") -> logging.Lo
 
 
 def get_logger(logger_name: str = "sr_automation") -> logging.Logger:
-    """
-    Get an existing logger instance by name.
-    
-    Useful when you already have a configured logger and just need to retrieve it.
-    
-    Args:
-        logger_name: Name of the logger to retrieve
-        
-    Returns:
-        Logger instance (may be unconfigured if setup_logger hasn't been called)
-    """
+    """Get an existing logger instance by name."""
     return logging.getLogger(logger_name)
 

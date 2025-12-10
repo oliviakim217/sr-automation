@@ -52,17 +52,7 @@ def query_table(
     table_name: str,
     limit: int = 10
 ) -> Dict[str, Any]:
-    """
-    Query ServiceNow table to retrieve records.
-    
-    Args:
-        sr_config: Service Request configuration dictionary
-        table_name: ServiceNow table name (e.g., "sc_request")
-        limit: Maximum number of records to return
-        
-    Returns:
-        Dictionary with ServiceNow API response (records in 'result' key)
-    """
+    """Query ServiceNow table to retrieve records."""
     logger.info(f"Querying ServiceNow table: {table_name}")
     
     servicenow_instance_url = _get_instance_url(sr_config)
@@ -120,7 +110,7 @@ def query_table(
             if "error" in servicenow_error_response:
                 servicenow_error_detail = servicenow_error_response["error"]
                 servicenow_error_message = servicenow_error_detail.get("message", servicenow_error_detail.get("detail", str(e)))
-        except:
+        except (ValueError, KeyError):
             pass  # Use default error message if parsing fails
         
         if servicenow_api_response.status_code == 401:
