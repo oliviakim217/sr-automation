@@ -1,16 +1,12 @@
-# ServiceNow Configuration
 config_version: "1.0.0"
 
 servicenow:
-  instance_url: ""  # Loaded from SERVICENOW_INSTANCE_URL env var at runtime
-  # ServiceNow Table API endpoint format: /api/now/table/{table_name}
-  api_path: "/api/now/table"  # Base path for Table API (no version in path)
+  instance_url: ""
+  api_path: "/api/now/table"
   table: "sc_request"
   query_params:
     sysparm_limit: 10
     sysparm_offset: 0
-    sysparm_display_value: false  # Return sys_id or display values for reference fields
-  # For GET requests, only Accept header is required per ServiceNow Table API
+    sysparm_display_value: false
   headers:
     Accept: "application/json"
-

@@ -47,7 +47,7 @@ def _get_instance_url(sr_config: Dict[str, Any]) -> str:
     return servicenow_instance_url
 
 
-def query_table(
+def fetch_table_records(
     sr_config: Dict[str, Any],
     table_name: str,
     limit: int = 10
@@ -61,16 +61,12 @@ def query_table(
     # Get API path from config (defaults to /api/now/table per ServiceNow Table API)
     servicenow_api_path = sr_config.get("servicenow", {}).get("api_path", "/api/now/table")
     
-    # Build API URL according to ServiceNow Table API: {instance}/api/now/table/{table_name}
     servicenow_api_url = f"{servicenow_instance_url}{servicenow_api_path}/{table_name}"
     
-    # Get default query params from config and override limit with function parameter
     servicenow_query_params_default = sr_config.get("servicenow", {}).get("query_params", {})
     servicenow_query_params = {**servicenow_query_params_default}  # Start with defaults from config
     servicenow_query_params["sysparm_limit"] = limit  # Override with function parameter
     
-    # Get headers from config
-    # For GET requests, only Accept header is required per ServiceNow Table API
     servicenow_api_headers = sr_config.get("servicenow", {}).get("headers", {
         "Accept": "application/json"
     })

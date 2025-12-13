@@ -1,8 +1,6 @@
-# Logging Configuration
 config_version: "1.0.0"
 
 logging:
-  level: "INFO"  # INFO level for production
+  level: "INFO"
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
   file: "logs/app.log"
-

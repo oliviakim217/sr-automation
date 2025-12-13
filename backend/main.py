@@ -81,7 +81,7 @@ async def health_check():
 
 
 @app.get("/api/query/{table_name}", response_model=QueryResponse)
-async def query_table(
+async def get_sr_table(
     request: Request,
     table_name: str,
     limit: int = 10
@@ -104,7 +104,7 @@ async def query_table(
         # Import and call ServiceNow module
         from backend.modules import servicenow
         
-        servicenow_response = servicenow.query_table(
+        servicenow_response = servicenow.fetch_table_records(
             sr_config=sr_config,
             table_name=table_name,
             limit=limit

@@ -1,8 +1,6 @@
-# Application Settings
 config_version: "1.0.0"
 
 app:
   name: "SR Automation Service"
-  version: "1.0.0"  # Application version (separate from config_version)
+  version: "1.0.0"
   environment: "prod"
-

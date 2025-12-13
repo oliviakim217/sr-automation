@@ -38,9 +38,9 @@ category: "language-rules"
 2. Basic examples:
    ```python
    def txn_process_payload(bank_input_payload: dict) -> dict:
-    """Process input data and return result."""
+       """Process input data and return result."""
        return {"status": "success", "txn_data": bank_input_payload}
-
+   
    def txn_calculate_aggregate(ledger_amounts: list[float]) -> float:
         """Calculate sum of prices."""
        return sum(ledger_amounts)
