@@ -145,18 +145,20 @@ async def create_sr(request: Request, sr_request: CreateSRRequest):
         
         sr_data = sr_request.model_dump(exclude_none=True)
         
+        if not sr_data.get("assigned_to"):
+            sr_data["assigned_to"] = sr_request.caller_id
+        
         result = servicenow.create_service_request(
             sr_config=sr_config,
             sr_data=sr_data
         )
         
-        logger.info(f"Created SR: {result.get('sr_number')}")
+        logger.info(f"Created SR: {result.get('request_id')}")
         
         return CreateSRResponse(
             status="success",
             message="Service Request created successfully",
-            sr_number=result.get("sr_number"),
-            sys_id=result.get("sys_id")
+            request_id=result.get("request_id")
         )
         
     except ValueError as e:

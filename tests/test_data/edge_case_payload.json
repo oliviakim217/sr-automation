@@ -1,7 +1,5 @@
 {
+  "caller_id": "user123",
   "short_description": "A",
-  "caller_id": "",
-  "category": "Hardware",
-  "description": "Testing edge cases: minimum length description, empty optional fields"
+  "description": "Testing edge cases: minimum length description"
 }
-

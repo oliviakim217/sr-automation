@@ -137,10 +137,12 @@ def create_service_request(
     
     servicenow_api_url = f"{servicenow_instance_url}{servicenow_api_path}/{table_name}"
     
-    servicenow_api_headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-    }
+    servicenow_api_headers = sr_config.get("servicenow", {}).get("headers", {
+        "Accept": "application/json"
+    })
+    if "Accept" not in servicenow_api_headers:
+        servicenow_api_headers["Accept"] = "application/json"
+    servicenow_api_headers["Content-Type"] = "application/json"
     
     try:
         servicenow_api_response = requests.post(
@@ -155,15 +157,12 @@ def create_service_request(
         servicenow_response_data = servicenow_api_response.json()
         
         sr_result = servicenow_response_data.get("result", {})
-        sr_number = sr_result.get("number", "")
-        sys_id = sr_result.get("sys_id", "")
+        request_id = sr_result.get("number", "")
         
-        logger.info(f"Created Service Request: {sr_number}")
+        logger.info(f"Created Service Request: {request_id}")
         
         return {
-            "sr_number": sr_number,
-            "sys_id": sys_id,
-            "result": sr_result
+            "request_id": request_id
         }
         
     except Timeout:
