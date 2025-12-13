@@ -5,9 +5,7 @@ Reads logging configuration from YAML config file and sets up file and console h
 """
 
 import logging
-import os
 from pathlib import Path
-from typing import Optional
 from logging.handlers import RotatingFileHandler
 
 

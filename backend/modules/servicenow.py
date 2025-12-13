@@ -121,3 +121,77 @@ def fetch_table_records(
         logger.error(f"Error querying {table_name}: {e}")
         raise RequestException(f"ServiceNow API request failed: {e}")
 
+
+def create_service_request(
+    sr_config: Dict[str, Any],
+    sr_data: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Create a Service Request in ServiceNow."""
+    logger.info("Creating Service Request in ServiceNow")
+    
+    servicenow_instance_url = _get_instance_url(sr_config)
+    servicenow_username, servicenow_password = _get_credentials()
+    
+    servicenow_api_path = sr_config.get("servicenow", {}).get("api_path", "/api/now/table")
+    table_name = sr_config.get("servicenow", {}).get("table", "sc_request")
+    
+    servicenow_api_url = f"{servicenow_instance_url}{servicenow_api_path}/{table_name}"
+    
+    servicenow_api_headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        servicenow_api_response = requests.post(
+            servicenow_api_url,
+            json=sr_data,
+            auth=HTTPBasicAuth(servicenow_username, servicenow_password),
+            headers=servicenow_api_headers,
+            timeout=30
+        )
+        
+        servicenow_api_response.raise_for_status()
+        servicenow_response_data = servicenow_api_response.json()
+        
+        sr_result = servicenow_response_data.get("result", {})
+        sr_number = sr_result.get("number", "")
+        sys_id = sr_result.get("sys_id", "")
+        
+        logger.info(f"Created Service Request: {sr_number}")
+        
+        return {
+            "sr_number": sr_number,
+            "sys_id": sys_id,
+            "result": sr_result
+        }
+        
+    except Timeout:
+        logger.error("Timeout creating Service Request")
+        raise RequestException("ServiceNow API request timed out")
+    except RequestsConnectionError as e:
+        logger.error(f"Connection error: {e}")
+        raise RequestException(f"Failed to connect to ServiceNow: {e}")
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"HTTP error creating SR: {e}")
+        servicenow_error_message = str(e)
+        try:
+            servicenow_error_response = servicenow_api_response.json()
+            if "error" in servicenow_error_response:
+                servicenow_error_detail = servicenow_error_response["error"]
+                servicenow_error_message = servicenow_error_detail.get("message", servicenow_error_detail.get("detail", str(e)))
+        except (ValueError, KeyError):
+            pass
+        
+        if servicenow_api_response.status_code == 401:
+            raise RequestException("ServiceNow authentication failed. Please check credentials.")
+        elif servicenow_api_response.status_code == 403:
+            raise RequestException("Access denied. Check user permissions for creating Service Requests.")
+        elif servicenow_api_response.status_code == 400:
+            raise RequestException(f"Invalid request data: {servicenow_error_message}")
+        else:
+            raise RequestException(f"ServiceNow API error ({servicenow_api_response.status_code}): {servicenow_error_message}")
+    except Exception as e:
+        logger.error(f"Error creating Service Request: {e}")
+        raise RequestException(f"ServiceNow API request failed: {e}")
+

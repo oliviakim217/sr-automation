@@ -7,7 +7,6 @@ FastAPI application for querying ServiceNow tables.
 import os
 from pathlib import Path
 from contextlib import asynccontextmanager
-from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -17,7 +16,7 @@ import requests
 from backend.config import load_config
 from backend.utils.logger import setup_logger
 from backend.utils.rate_limiter import create_rate_limiter
-from backend.modules.models import QueryResponse
+from backend.modules.models import QueryResponse, CreateSRRequest, CreateSRResponse
 
 
 # Load environment variables
@@ -39,7 +38,6 @@ rate_limit_config = sr_config.get("rate_limit", {})
 rate_limiter = None
 if rate_limit_config.get("enabled", False):
     rate_limiter = create_rate_limiter({"rate_limit": rate_limit_config})
-    excluded_paths = rate_limit_config.get("excluded_paths", [])
     logger.info(f"Rate limiting enabled: {rate_limit_config.get('max_calls_per_day')} calls/day per IP")
 else:
     logger.info("Rate limiting disabled")
@@ -121,6 +119,44 @@ async def get_sr_table(
             table_name=table_name,
             count=len(servicenow_records),
             records=servicenow_records
+        )
+        
+    except ValueError as e:
+        logger.error(f"Validation error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except requests.exceptions.RequestException as e:
+        logger.error(f"ServiceNow API error: {e}")
+        raise HTTPException(status_code=502, detail=f"ServiceNow API error: {str(e)}")
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="An internal error occurred")
+
+
+@app.post("/api/sr/create", response_model=CreateSRResponse)
+async def create_sr(request: Request, sr_request: CreateSRRequest):
+    """Create a Service Request in ServiceNow."""
+    if rate_limiter:
+        rate_limiter.check_rate_limit(request)
+    
+    logger.info(f"Create SR request: {sr_request.short_description[:50]}...")
+    
+    try:
+        from backend.modules import servicenow
+        
+        sr_data = sr_request.model_dump(exclude_none=True)
+        
+        result = servicenow.create_service_request(
+            sr_config=sr_config,
+            sr_data=sr_data
+        )
+        
+        logger.info(f"Created SR: {result.get('sr_number')}")
+        
+        return CreateSRResponse(
+            status="success",
+            message="Service Request created successfully",
+            sr_number=result.get("sr_number"),
+            sys_id=result.get("sys_id")
         )
         
     except ValueError as e:
