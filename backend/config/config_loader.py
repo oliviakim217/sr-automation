@@ -14,28 +14,28 @@ SUPPORTED_CONFIG_VERSIONS = ["1.0.0"]
 def _load_single_config(config_path: Path) -> Dict[str, Any]:
     """Load a single YAML config file."""
     with open(config_path, 'r', encoding='utf-8') as yaml_file_handle:
-        config = yaml.safe_load(yaml_file_handle)
+        cfg_loaded = yaml.safe_load(yaml_file_handle)
     
-    if not config:
+    if not cfg_loaded:
         raise ValueError(f"Config file is empty: {config_path}")
     
     # Validate version is supported
-    config_version = config.get("config_version")
+    config_version = cfg_loaded.get("config_version")
     if config_version and config_version not in SUPPORTED_CONFIG_VERSIONS:
         raise ValueError(
             f"Unsupported config version: {config_version}. "
             f"Supported versions: {SUPPORTED_CONFIG_VERSIONS}"
         )
     
-    return config
+    return cfg_loaded
 
 
-def _merge_configs(configs: list[Dict[str, Any]]) -> Dict[str, Any]:
+def _merge_configs(cfg_list: list[Dict[str, Any]]) -> Dict[str, Any]:
     """Merge multiple config dictionaries, later configs override earlier ones."""
-    merged_config = {}
-    for config in configs:
-        merged_config.update(config)
-    return merged_config
+    cfg_merged = {}
+    for cfg_item in cfg_list:
+        cfg_merged.update(cfg_item)
+    return cfg_merged
 
 
 def load_config(config_dir: str) -> Dict[str, Any]:
@@ -51,18 +51,18 @@ def load_config(config_dir: str) -> Dict[str, Any]:
     if not config_files:
         raise ValueError(f"No config files found in: {config_dir}")
     
-    configs = []
+    cfg_list = []
     for config_file in config_files:
-        config = _load_single_config(config_file)
-        configs.append(config)
+        cfg_loaded = _load_single_config(config_file)
+        cfg_list.append(cfg_loaded)
     
     # Merge all configs
-    merged_config = _merge_configs(configs)
+    cfg_merged = _merge_configs(cfg_list)
     
     # Load ServiceNow URL from environment variable
-    if "servicenow" in merged_config:
+    if "servicenow" in cfg_merged:
         instance_url = os.getenv("SERVICENOW_INSTANCE_URL", "")
         if instance_url:
-            merged_config["servicenow"]["instance_url"] = instance_url
+            cfg_merged["servicenow"]["instance_url"] = instance_url
     
-    return merged_config
+    return cfg_merged

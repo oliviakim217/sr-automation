@@ -1,0 +1,132 @@
+---
+alwaysApply: true
+---
+
+## Python Naming Best Practices
+
+### Function Naming
+
+1. Use **snake_case** for all function names.
+2. Function names should be **verbs or verb phrases** that describe an action.
+   - Examples: `validate_payload`, `create_service_request`, `fetch_records`
+3. Use specific, descriptive names. Example: Instead of `date`, use `dt_txn` (transaction date) or `dt_created` (creation date). Align with domain standards (i.e. banking). Avoid vague names like `process`, `handle`, or `do_work`.
+4. Prefix **internal/private functions** with `_` (underscore).
+   - Example: `_validate_input`, `_build_payload`
+5. Avoid embedding implementation details in function names.
+   - Prefer `fetch_records()` over `fetch_records_with_requests()`
+6. Keep functions focused on **one responsibility**.
+7. Use domain language where applicable.
+   - Example: `sr_create_request`, `sr_validate_payload`
+
+---
+
+### Layer / Responsibility Naming (API vs Client)
+
+1. **FastAPI endpoint handler functions** must start with `api_` to make it obvious they are HTTP handlers.
+   - Examples: `api_create_service_request()`, `api_get_table_records()`
+2. **ServiceNow client functions** should use clean, domain-friendly names without `api_` (these functions call ServiceNow, not your API).
+   - Examples: `create_sr()`, `fetch_table_records()`
+3. **Abbreviations**: You may shorten “Service Request” to `sr` (functions/variables) or `SR` (classes/types) as long as you stay consistent within a file/module.
+
+
+---
+
+### Variable Naming
+
+1. Use **snake_case** for all variables.
+2. Variable names should describe **what the data represents**, not how it’s used.
+3. Avoid single-letter or generic names (`x`, `tmp`, `data`, `obj`) unless used in very small scopes.
+4. Use **unique, searchable names** to make refactoring easy.
+5. Avoid shadowing built-ins (`list`, `dict`, `id`, `type`, `date`).
+6. Prefer **domain-specific names**:
+   - `dt_created` instead of `date`
+   - `sr_number` instead of `number`
+7. Use consistent prefixes where helpful:
+   - `sr_` for Service Request data
+   - `cfg_` for configuration values
+   - `env_` for environment-derived values
+8. Boolean variables should read like a condition:
+   - `is_valid`, `has_errors`, `should_retry`
+
+---
+
+### Constant Naming
+
+1. Use **UPPER_CASE_SNAKE_CASE** for constants.
+2. Constants should be defined in a **dedicated module** (e.g., `constants.py`).
+3. Do not hardcode magic values in logic.
+   - Example: `DEFAULT_TIMEOUT_SECONDS = 30`
+4. Constants should represent values that rarely change.
+
+---
+
+### Class Naming
+
+1. Use **PascalCase**.
+2. Class names must represent **nouns**, not actions (avoid verbs like `Create`, `Validate` in class names).
+3. Be **specific and descriptive**; avoid vague names like `Manager`, `Handler`, or `Processor` unless clearly scoped.
+4. Do **not** include implementation details in class names (e.g., avoid `RequestsBasedClient`).
+5. Follow **single responsibility**: one class = one clear purpose.
+6. Use **domain language** where applicable (e.g., `SR`, `RequestItem`, `ServiceNowTask`).
+7. Apply consistent suffixes where helpful:
+   - `Client` (external API access)
+   - `Service` (business logic)
+   - `Validator`, `Transformer`, `Enricher`
+   - `Config`, `Response`
+8. Pydantic model classes should reflect **data shape**, not behavior (e.g., `CreateServiceRequestInput`).
+9. Do **not** prefix class names with `_` (underscores are for internal functions, not classes).
+---
+
+### Module / File Naming
+
+1. Use **snake_case** for file and module names.
+2. File names should reflect the responsibility of the code inside.
+   - `servicenow_client.py`
+   - `validation.py`
+   - `config_loader.py`
+3. Avoid overly generic file names like `helpers.py` unless clearly scoped.
+4. Keep modules small and cohesive.
+
+---
+
+### Environment Variable Naming
+
+1. Use **UPPER_CASE** with underscores.
+2. Prefix variables to avoid collisions:
+   - `SERVICENOW_`, `APP_`, `SR_`
+3. Names should clearly indicate purpose:
+   - `SERVICENOW_INSTANCE_URL`
+   - `SR_DEFAULT_LIMIT`
+4. Never hardcode secrets; always load from environment variables.
+
+---
+
+### API & JSON Field Naming
+
+1. Use **snake_case** for internal Python models.
+2. Match **external API field names** exactly when required (e.g., ServiceNow fields).
+3. Be explicit in request/response models:
+   - Avoid generic keys like `data`, `result` unless standardized.
+4. Keep request and response schemas stable and versioned.
+
+---
+
+### Logging Naming
+
+1. Include function or operation names in log messages.
+2. Use consistent prefixes:
+   - `BEGIN:<operation>`
+   - `END:<operation>`
+   - `ERROR:<operation>`
+3. Avoid logging sensitive values (passwords, tokens, secrets).
+
+---
+
+### General Naming Principles
+
+1. Optimize for **readability over brevity**.
+2. Names should be understandable **without comments**.
+3. Be consistent across the entire codebase.
+4. If you hesitate while naming something, it’s often a sign the responsibility is unclear.
+5. Favor clarity for future maintainers (including your future self).
+

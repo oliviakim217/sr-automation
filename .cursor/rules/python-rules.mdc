@@ -65,12 +65,6 @@ category: "language-rules"
 4. **Never commit** `venv/` folder to Git (already in .gitignore).
 
 
-### Naming Convention
-
-1. Follow Python naming conventions: `snake_case` for variables/functions, `PascalCase` for classes, `UPPER_CASE` for constants.
-2. Use specific, descriptive names. Example: Instead of `date`, use `dt_txn` (transaction date) or `dt_created` (creation date). Align with domain standards (i.e. banking).
-3. Prefix private/internal functions with underscore: `def _my_internal_function():` - indicates it's not meant to be called from outside the module.
-
 
 
 ### Functions and Methods

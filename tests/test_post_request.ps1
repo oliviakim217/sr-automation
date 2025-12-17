@@ -20,3 +20,5 @@ foreach ($test in $testFiles) {
     }
     Write-Host ""
 }
+
+# return the status code for deployement script. only deploy when success. exit 0/1

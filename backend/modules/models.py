@@ -8,7 +8,7 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
 
 
-class CreateSRRequest(BaseModel):
+class SRCreationInput(BaseModel):
     """Request model for creating a Service Request."""
     
     caller_id: str = Field(...)
@@ -17,16 +17,16 @@ class CreateSRRequest(BaseModel):
     assigned_to: Optional[str] = Field(None)
 
 
-class CreateSRResponse(BaseModel):
+class SRCreationResponse(BaseModel):
     """Response model for Service Request creation."""
     
     status: str = Field(...)
     message: str = Field(...)
-    request_id: Optional[str] = Field(None) # only return REQ ID e.g. REQ000001 
+    request_id: Optional[str] = Field(None) 
 
 
-class QueryResponse(BaseModel):
-    """Response model for querying ServiceNow records."""
+class TableQueryResponse(BaseModel):
+    """Response model for querying ServiceNow table records."""
     
     status: str = Field(...)
     message: str = Field(...)

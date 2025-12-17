@@ -56,10 +56,10 @@ class RateLimiter:
         self.calls_by_ip[ip_address].append(now)
 
 
-def create_rate_limiter(rate_limit_config: dict) -> RateLimiter:
+def create_rate_limiter(cfg_app_config: dict) -> RateLimiter:
     """Create rate limiter instance from configuration."""
-    rate_limit_settings = rate_limit_config.get("rate_limit", {})
+    cfg_rate_limit_settings = cfg_app_config.get("rate_limit", {})
     return RateLimiter(
-        max_calls_per_day=rate_limit_settings.get("max_calls_per_day", 1000)
+        max_calls_per_day=cfg_rate_limit_settings.get("max_calls_per_day", 1000)
     )
 

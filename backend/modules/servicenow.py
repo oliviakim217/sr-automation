@@ -29,9 +29,9 @@ def _get_credentials() -> Tuple[str, str]:
     return username, password
 
 
-def _get_instance_url(sr_config: Dict[str, Any]) -> str:
+def _get_instance_url(cfg_app_config: Dict[str, Any]) -> str:
     """Get ServiceNow instance URL from config or environment variable."""
-    servicenow_instance_url = sr_config.get("servicenow", {}).get("instance_url", "")
+    servicenow_instance_url = cfg_app_config.get("servicenow", {}).get("instance_url", "")
     
     if not servicenow_instance_url:
         servicenow_instance_url = os.getenv("SERVICENOW_INSTANCE_URL", "")
@@ -48,26 +48,26 @@ def _get_instance_url(sr_config: Dict[str, Any]) -> str:
 
 
 def fetch_table_records(
-    sr_config: Dict[str, Any],
+    cfg_app_config: Dict[str, Any],
     table_name: str,
     limit: int = 10
 ) -> Dict[str, Any]:
     """Query ServiceNow table to retrieve records."""
     logger.info(f"Querying ServiceNow table: {table_name}")
     
-    servicenow_instance_url = _get_instance_url(sr_config)
+    servicenow_instance_url = _get_instance_url(cfg_app_config)
     servicenow_username, servicenow_password = _get_credentials()
     
     # Get API path from config (defaults to /api/now/table per ServiceNow Table API)
-    servicenow_api_path = sr_config.get("servicenow", {}).get("api_path", "/api/now/table")
+    servicenow_api_path = cfg_app_config.get("servicenow", {}).get("api_path", "/api/now/table")
     
     servicenow_api_url = f"{servicenow_instance_url}{servicenow_api_path}/{table_name}"
     
-    servicenow_query_params_default = sr_config.get("servicenow", {}).get("query_params", {})
+    servicenow_query_params_default = cfg_app_config.get("servicenow", {}).get("query_params", {})
     servicenow_query_params = {**servicenow_query_params_default}  # Start with defaults from config
     servicenow_query_params["sysparm_limit"] = limit  # Override with function parameter
     
-    servicenow_api_headers = sr_config.get("servicenow", {}).get("headers", {
+    servicenow_api_headers = cfg_app_config.get("servicenow", {}).get("headers", {
         "Accept": "application/json"
     })
     # Ensure Accept header is set (required for ServiceNow Table API)
@@ -84,12 +84,12 @@ def fetch_table_records(
         )
         
         servicenow_api_response.raise_for_status()
-        servicenow_response_data = servicenow_api_response.json()
+        servicenow_response_json = servicenow_api_response.json()
         
-        record_count = len(servicenow_response_data.get("result", []))
+        record_count = len(servicenow_response_json.get("result", []))
         logger.info(f"Retrieved {record_count} records from {table_name}")
         
-        return servicenow_response_data
+        return servicenow_response_json
         
     except Timeout:
         logger.error(f"Timeout querying {table_name}")
@@ -122,22 +122,22 @@ def fetch_table_records(
         raise RequestException(f"ServiceNow API request failed: {e}")
 
 
-def create_service_request(
-    sr_config: Dict[str, Any],
-    sr_data: Dict[str, Any]
+def create_sr(
+    cfg_app_config: Dict[str, Any],
+    sr_request_payload: Dict[str, Any]
 ) -> Dict[str, Any]:
     """Create a Service Request in ServiceNow."""
     logger.info("Creating Service Request in ServiceNow")
     
-    servicenow_instance_url = _get_instance_url(sr_config)
+    servicenow_instance_url = _get_instance_url(cfg_app_config)
     servicenow_username, servicenow_password = _get_credentials()
     
-    servicenow_api_path = sr_config.get("servicenow", {}).get("api_path", "/api/now/table")
-    table_name = sr_config.get("servicenow", {}).get("table", "sc_request")
+    servicenow_api_path = cfg_app_config.get("servicenow", {}).get("api_path", "/api/now/table")
+    table_name = cfg_app_config.get("servicenow", {}).get("table", "sc_request")
     
     servicenow_api_url = f"{servicenow_instance_url}{servicenow_api_path}/{table_name}"
     
-    servicenow_api_headers = sr_config.get("servicenow", {}).get("headers", {
+    servicenow_api_headers = cfg_app_config.get("servicenow", {}).get("headers", {
         "Accept": "application/json"
     })
     if "Accept" not in servicenow_api_headers:
@@ -147,16 +147,16 @@ def create_service_request(
     try:
         servicenow_api_response = requests.post(
             servicenow_api_url,
-            json=sr_data,
+            json=sr_request_payload,
             auth=HTTPBasicAuth(servicenow_username, servicenow_password),
             headers=servicenow_api_headers,
             timeout=30
         )
         
         servicenow_api_response.raise_for_status()
-        servicenow_response_data = servicenow_api_response.json()
+        servicenow_response_json = servicenow_api_response.json()
         
-        sr_result = servicenow_response_data.get("result", {})
+        sr_result = servicenow_response_json.get("result", {})
         request_id = sr_result.get("number", "")
         
         logger.info(f"Created Service Request: {request_id}")

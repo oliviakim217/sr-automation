@@ -9,10 +9,10 @@ from pathlib import Path
 from logging.handlers import RotatingFileHandler
 
 
-def setup_logger(config: dict, logger_name: str = "sr_automation") -> logging.Logger:
+def setup_logger(cfg_app_config: dict, logger_name: str = "sr_automation") -> logging.Logger:
     """Set up logger based on configuration from YAML config file."""
     # Get logging config from config dictionary
-    sr_logging_config = config.get("logging", {})
+    sr_logging_config = cfg_app_config.get("logging", {})
     
     # Get log level (default to INFO if not specified)
     sr_log_level_str = sr_logging_config.get("level", "INFO").upper()
