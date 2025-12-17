@@ -13,6 +13,7 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import requests
 
+from backend.constants import API_LIMIT_MAX, API_LIMIT_MIN
 from backend.config import load_config
 from backend.utils.logger import setup_logger
 from backend.utils.rate_limiter import create_rate_limiter
@@ -101,8 +102,11 @@ async def api_get_table_records(
     if not table_name or len(table_name.strip()) == 0:
         raise HTTPException(status_code=400, detail="Table name cannot be empty")
     
-    if limit < 1 or limit > 100:
-        raise HTTPException(status_code=400, detail="Limit must be between 1 and 100")
+    if limit < API_LIMIT_MIN or limit > API_LIMIT_MAX:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Limit must be between {API_LIMIT_MIN} and {API_LIMIT_MAX}",
+        )
     
     try:
         # Import and call ServiceNow module

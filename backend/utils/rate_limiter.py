@@ -9,6 +9,7 @@ from typing import Dict
 from collections import defaultdict
 from fastapi import Request, HTTPException, status
 
+from backend.constants import DEFAULT_RATE_LIMIT_MAX_CALLS_PER_DAY
 
 class RateLimiter:
     """
@@ -60,6 +61,8 @@ def create_rate_limiter(cfg_app_config: dict) -> RateLimiter:
     """Create rate limiter instance from configuration."""
     cfg_rate_limit_settings = cfg_app_config.get("rate_limit", {})
     return RateLimiter(
-        max_calls_per_day=cfg_rate_limit_settings.get("max_calls_per_day", 1000)
+        max_calls_per_day=cfg_rate_limit_settings.get(
+            "max_calls_per_day", DEFAULT_RATE_LIMIT_MAX_CALLS_PER_DAY
+        )
     )
 

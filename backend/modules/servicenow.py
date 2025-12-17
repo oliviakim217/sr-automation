@@ -13,6 +13,12 @@ from typing import Dict, Any, Optional, Tuple
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import RequestException, Timeout, ConnectionError as RequestsConnectionError
 
+from backend.constants import (
+    DEFAULT_HTTP_TIMEOUT_SECONDS,
+    DEFAULT_JSON_MIME_TYPE,
+    DEFAULT_SERVICENOW_API_PATH,
+    DEFAULT_SERVICENOW_TABLE,
+)
 from backend.utils.logger import get_logger
 
 logger = get_logger("sr_automation")
@@ -59,7 +65,7 @@ def fetch_table_records(
     servicenow_username, servicenow_password = _get_credentials()
     
     # Get API path from config (defaults to /api/now/table per ServiceNow Table API)
-    servicenow_api_path = cfg_app_config.get("servicenow", {}).get("api_path", "/api/now/table")
+    servicenow_api_path = cfg_app_config.get("servicenow", {}).get("api_path", DEFAULT_SERVICENOW_API_PATH)
     
     servicenow_api_url = f"{servicenow_instance_url}{servicenow_api_path}/{table_name}"
     
@@ -80,7 +86,7 @@ def fetch_table_records(
             params=servicenow_query_params,
             auth=HTTPBasicAuth(servicenow_username, servicenow_password),
             headers=servicenow_api_headers,
-            timeout=30
+            timeout=DEFAULT_HTTP_TIMEOUT_SECONDS
         )
         
         servicenow_api_response.raise_for_status()
@@ -132,8 +138,8 @@ def create_sr(
     servicenow_instance_url = _get_instance_url(cfg_app_config)
     servicenow_username, servicenow_password = _get_credentials()
     
-    servicenow_api_path = cfg_app_config.get("servicenow", {}).get("api_path", "/api/now/table")
-    table_name = cfg_app_config.get("servicenow", {}).get("table", "sc_request")
+    servicenow_api_path = cfg_app_config.get("servicenow", {}).get("api_path", DEFAULT_SERVICENOW_API_PATH)
+    table_name = cfg_app_config.get("servicenow", {}).get("table", DEFAULT_SERVICENOW_TABLE)
     
     servicenow_api_url = f"{servicenow_instance_url}{servicenow_api_path}/{table_name}"
     
@@ -142,7 +148,7 @@ def create_sr(
     })
     if "Accept" not in servicenow_api_headers:
         servicenow_api_headers["Accept"] = "application/json"
-    servicenow_api_headers["Content-Type"] = "application/json"
+    servicenow_api_headers["Content-Type"] = DEFAULT_JSON_MIME_TYPE
     
     try:
         servicenow_api_response = requests.post(
@@ -150,7 +156,7 @@ def create_sr(
             json=sr_request_payload,
             auth=HTTPBasicAuth(servicenow_username, servicenow_password),
             headers=servicenow_api_headers,
-            timeout=30
+            timeout=DEFAULT_HTTP_TIMEOUT_SECONDS
         )
         
         servicenow_api_response.raise_for_status()
