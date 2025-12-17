@@ -23,6 +23,14 @@ class SRCreationResponse(BaseModel):
     status: str = Field(...)
     message: str = Field(...)
     request_id: Optional[str] = Field(None) 
+    sys_id: Optional[str] = Field(None)
+    sys_created_on: Optional[str] = Field(None)
+    sys_updated_on: Optional[str] = Field(None)
+    opened_at: Optional[str] = Field(None)
+    state: Optional[str] = Field(None)
+    approval: Optional[str] = Field(None)
+    request_state: Optional[str] = Field(None)
+    stage: Optional[str] = Field(None)
 
 
 class TableQueryResponse(BaseModel):

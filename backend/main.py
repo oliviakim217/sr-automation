@@ -182,7 +182,15 @@ async def api_create_service_request(request: Request, sr_request: SRCreationInp
         return SRCreationResponse(
             status="success",
             message="Service Request created successfully",
-            request_id=created_request_id
+            request_id=created_request_id,
+            sys_id=sr_creation_result.get("sys_id"),
+            sys_created_on=sr_creation_result.get("sys_created_on"),
+            sys_updated_on=sr_creation_result.get("sys_updated_on"),
+            opened_at=sr_creation_result.get("opened_at"),
+            state=sr_creation_result.get("state"),
+            approval=sr_creation_result.get("approval"),
+            request_state=sr_creation_result.get("request_state"),
+            stage=sr_creation_result.get("stage"),
         )
         
     except ValueError as e:

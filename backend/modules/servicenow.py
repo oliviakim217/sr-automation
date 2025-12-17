@@ -173,9 +173,25 @@ def create_sr(
         
         sr_result = servicenow_response_json.get("result", {})
         request_id = sr_result.get("number", "")
+        sys_id = sr_result.get("sys_id", None)
+        sys_created_on = sr_result.get("sys_created_on", None)
+        sys_updated_on = sr_result.get("sys_updated_on", None)
+        opened_at = sr_result.get("opened_at", None)
+        state = sr_result.get("state", None)
+        approval = sr_result.get("approval", None)
+        request_state = sr_result.get("request_state", None)
+        stage = sr_result.get("stage", None)
         
         return {
-            "request_id": request_id
+            "request_id": request_id,
+            "sys_id": sys_id,
+            "sys_created_on": sys_created_on,
+            "sys_updated_on": sys_updated_on,
+            "opened_at": opened_at,
+            "state": state,
+            "approval": approval,
+            "request_state": request_state,
+            "stage": stage,
         }
         
     except Timeout:
