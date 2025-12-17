@@ -18,13 +18,11 @@ def setup_logger(cfg_app_config: dict, logger_name: str = "sr_automation") -> lo
     sr_log_level_str = sr_logging_config.get("level", "INFO").upper()
     sr_log_level = getattr(logging, sr_log_level_str, logging.INFO)
     
-    # Get log format (default format if not specified)
     sr_log_format = sr_logging_config.get(
         "format",
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     
-    # Get log file path (default to logs/app.log)
     sr_log_file_path = sr_logging_config.get("file", "logs/app.log")
     
     # Create logger instance
@@ -38,14 +36,12 @@ def setup_logger(cfg_app_config: dict, logger_name: str = "sr_automation") -> lo
     # Create formatter
     sr_log_formatter = logging.Formatter(sr_log_format)
     
-    # Set up file handler with rotation
-    # Rotate when file reaches 10MB, keep 5 backup files
+    # Set up file handler with rotation - rotate when file reaches 10MB, keep 5 backup files
     log_file_path = Path(sr_log_file_path)
     
     # Create log directory if it doesn't exist
     log_file_path.parent.mkdir(parents=True, exist_ok=True)
     
-    # File handler with rotation (max 10MB per file, keep 5 backups)
     file_handler = RotatingFileHandler(
         log_file_path,
         maxBytes=10 * 1024 * 1024,  # 10MB

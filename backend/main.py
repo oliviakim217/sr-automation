@@ -5,6 +5,7 @@ FastAPI application for querying ServiceNow tables.
 """
 
 import os
+import time
 from pathlib import Path
 from contextlib import asynccontextmanager
 
@@ -43,20 +44,24 @@ cfg_rate_limit_config = cfg_app_config.get("rate_limit", {})
 rate_limiter = None
 if cfg_rate_limit_config.get("enabled", False):
     rate_limiter = create_rate_limiter(cfg_app_config)
-    logger.info(
-        f"BEGIN:rate_limit enabled max_calls_per_day={cfg_rate_limit_config.get('max_calls_per_day')}"
-    )
+    logger.info(f"rate_limit enabled max_calls_per_day={cfg_rate_limit_config.get('max_calls_per_day')}")
 else:
-    logger.info("BEGIN:rate_limit disabled")
+    logger.info("rate_limit disabled")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Handle application startup and shutdown."""
-    logger.info(f"BEGIN:startup service={cfg_app_config.get('app', {}).get('name', 'SR Automation Service')}")
-    logger.info(f"BEGIN:startup env={env_servicenow_environment}")
-    yield
+    logger.info(
+        f"BEGIN:startup service={cfg_app_config.get('app', {}).get('name', 'SR Automation Service')} "
+        f"env={env_servicenow_environment}"
+    )
     logger.info("END:startup")
+    try:
+        yield
+    finally:
+        logger.info("BEGIN:shutdown")
+        logger.info("END:shutdown")
 
 
 # Create FastAPI app
@@ -96,7 +101,9 @@ async def api_get_table_records(
     if rate_limiter:
         rate_limiter.check_rate_limit(request)
     
-    logger.info(f"BEGIN:query_table table_name={table_name} limit={limit}")
+    api_start_time = time.monotonic()
+    table_record_count: int | None = None
+    logger.info(f"BEGIN:api_get_table_records table_name={table_name} limit={limit}")
     
     # Validate inputs
     if not table_name or len(table_name.strip()) == 0:
@@ -120,8 +127,7 @@ async def api_get_table_records(
         
         # Extract records from ServiceNow response
         table_records = servicenow_response.get("result", [])
-        
-        logger.info(f"END:query_table table_name={table_name} count={len(table_records)}")
+        table_record_count = len(table_records)
         
         return TableQueryResponse(
             status="success",
@@ -132,14 +138,20 @@ async def api_get_table_records(
         )
         
     except ValueError as e:
-        logger.error(f"ERROR:query_table validation_error={e}")
+        logger.error(f"ERROR:api_get_table_records validation_error={e}")
         raise HTTPException(status_code=400, detail=str(e))
     except requests.exceptions.RequestException as e:
-        logger.error(f"ERROR:query_table servicenow_error={e}")
+        logger.error(f"ERROR:api_get_table_records servicenow_error={e}")
         raise HTTPException(status_code=502, detail=f"ServiceNow API error: {str(e)}")
     except Exception as e:
-        logger.error(f"ERROR:query_table unexpected_error={e}", exc_info=True)
+        logger.error(f"ERROR:api_get_table_records unexpected_error={e}", exc_info=True)
         raise HTTPException(status_code=500, detail="An internal error occurred")
+    finally:
+        api_duration_ms = int((time.monotonic() - api_start_time) * 1000)
+        logger.info(
+            f"END:api_get_table_records table_name={table_name} count={table_record_count} "
+            f"duration_ms={api_duration_ms}"
+        )
 
 
 @app.post("/api/sr/create", response_model=SRCreationResponse)
@@ -148,7 +160,9 @@ async def api_create_service_request(request: Request, sr_request: SRCreationInp
     if rate_limiter:
         rate_limiter.check_rate_limit(request)
     
-    logger.info(f"BEGIN:create_service_request short_description={sr_request.short_description[:50]}")
+    api_start_time = time.monotonic()
+    created_request_id: str | None = None
+    logger.info("BEGIN:api_create_service_request")
     
     try:
         from backend.modules import servicenow
@@ -162,30 +176,35 @@ async def api_create_service_request(request: Request, sr_request: SRCreationInp
             cfg_app_config=cfg_app_config,
             sr_request_payload=sr_request_payload
         )
-        
-        logger.info(f"Created SR: {sr_creation_result.get('request_id')}")
+
+        created_request_id = sr_creation_result.get("request_id")
         
         return SRCreationResponse(
             status="success",
             message="Service Request created successfully",
-            request_id=sr_creation_result.get("request_id")
+            request_id=created_request_id
         )
         
     except ValueError as e:
-        logger.error(f"ERROR:create_service_request validation_error={e}")
+        logger.error(f"ERROR:api_create_service_request validation_error={e}")
         raise HTTPException(status_code=400, detail=str(e))
     except requests.exceptions.RequestException as e:
-        logger.error(f"ERROR:create_service_request servicenow_error={e}")
+        logger.error(f"ERROR:api_create_service_request servicenow_error={e}")
         raise HTTPException(status_code=502, detail=f"ServiceNow API error: {str(e)}")
     except Exception as e:
-        logger.error(f"ERROR:create_service_request unexpected_error={e}", exc_info=True)
+        logger.error(f"ERROR:api_create_service_request unexpected_error={e}", exc_info=True)
         raise HTTPException(status_code=500, detail="An internal error occurred")
+    finally:
+        api_duration_ms = int((time.monotonic() - api_start_time) * 1000)
+        logger.info(
+            f"END:api_create_service_request request_id={created_request_id} duration_ms={api_duration_ms}"
+        )
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request, exc):
     """Global exception handler."""
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    logger.error(f"ERROR:unhandled_exception error={exc}", exc_info=True)
     return JSONResponse(
         status_code=500,
         content={

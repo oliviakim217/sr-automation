@@ -8,6 +8,7 @@ Simple module to query ServiceNow tables using the Table API.
 """
 
 import os
+import time
 import requests
 from typing import Dict, Any, Optional, Tuple
 from requests.auth import HTTPBasicAuth
@@ -59,7 +60,9 @@ def fetch_table_records(
     limit: int = 10
 ) -> Dict[str, Any]:
     """Query ServiceNow table to retrieve records."""
-    logger.info(f"Querying ServiceNow table: {table_name}")
+    client_start_time = time.monotonic()
+    record_count: int | None = None
+    logger.info(f"BEGIN:fetch_table_records table_name={table_name} limit={limit}")
     
     servicenow_instance_url = _get_instance_url(cfg_app_config)
     servicenow_username, servicenow_password = _get_credentials()
@@ -93,18 +96,17 @@ def fetch_table_records(
         servicenow_response_json = servicenow_api_response.json()
         
         record_count = len(servicenow_response_json.get("result", []))
-        logger.info(f"Retrieved {record_count} records from {table_name}")
         
         return servicenow_response_json
         
     except Timeout:
-        logger.error(f"Timeout querying {table_name}")
+        logger.error(f"ERROR:fetch_table_records timeout table_name={table_name}")
         raise RequestException("ServiceNow API request timed out")
     except RequestsConnectionError as e:
-        logger.error(f"Connection error: {e}")
+        logger.error(f"ERROR:fetch_table_records connection_error={e}")
         raise RequestException(f"Failed to connect to ServiceNow: {e}")
     except requests.exceptions.HTTPError as e:
-        logger.error(f"HTTP error: {e}")
+        logger.error(f"ERROR:fetch_table_records http_error={e}")
         # Parse ServiceNow error response if available
         servicenow_error_message = str(e)
         try:
@@ -124,8 +126,13 @@ def fetch_table_records(
         else:
             raise RequestException(f"ServiceNow API error ({servicenow_api_response.status_code}): {servicenow_error_message}")
     except Exception as e:
-        logger.error(f"Error querying {table_name}: {e}")
+        logger.error(f"ERROR:fetch_table_records unexpected_error={e}")
         raise RequestException(f"ServiceNow API request failed: {e}")
+    finally:
+        duration_ms = int((time.monotonic() - client_start_time) * 1000)
+        logger.info(
+            f"END:fetch_table_records table_name={table_name} count={record_count} duration_ms={duration_ms}"
+        )
 
 
 def create_sr(
@@ -133,7 +140,9 @@ def create_sr(
     sr_request_payload: Dict[str, Any]
 ) -> Dict[str, Any]:
     """Create a Service Request in ServiceNow."""
-    logger.info("Creating Service Request in ServiceNow")
+    client_start_time = time.monotonic()
+    request_id: str | None = None
+    logger.info("BEGIN:create_sr")
     
     servicenow_instance_url = _get_instance_url(cfg_app_config)
     servicenow_username, servicenow_password = _get_credentials()
@@ -165,20 +174,18 @@ def create_sr(
         sr_result = servicenow_response_json.get("result", {})
         request_id = sr_result.get("number", "")
         
-        logger.info(f"Created Service Request: {request_id}")
-        
         return {
             "request_id": request_id
         }
         
     except Timeout:
-        logger.error("Timeout creating Service Request")
+        logger.error("ERROR:create_sr timeout")
         raise RequestException("ServiceNow API request timed out")
     except RequestsConnectionError as e:
-        logger.error(f"Connection error: {e}")
+        logger.error(f"ERROR:create_sr connection_error={e}")
         raise RequestException(f"Failed to connect to ServiceNow: {e}")
     except requests.exceptions.HTTPError as e:
-        logger.error(f"HTTP error creating SR: {e}")
+        logger.error(f"ERROR:create_sr http_error={e}")
         servicenow_error_message = str(e)
         try:
             servicenow_error_response = servicenow_api_response.json()
@@ -197,6 +204,9 @@ def create_sr(
         else:
             raise RequestException(f"ServiceNow API error ({servicenow_api_response.status_code}): {servicenow_error_message}")
     except Exception as e:
-        logger.error(f"Error creating Service Request: {e}")
+        logger.error(f"ERROR:create_sr unexpected_error={e}")
         raise RequestException(f"ServiceNow API request failed: {e}")
+    finally:
+        duration_ms = int((time.monotonic() - client_start_time) * 1000)
+        logger.info(f"END:create_sr request_id={request_id} duration_ms={duration_ms}")
 

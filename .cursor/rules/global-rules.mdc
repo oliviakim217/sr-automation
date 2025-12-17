@@ -68,6 +68,11 @@ category: "general-rules"
 2. Set appropriate log levels: DEBUG (detailed info), INFO (general info), WARNING (potential issues), ERROR (errors), CRITICAL (serious failures).
 3. Log important events: function entry/exit, data transformations, API calls, errors.
 4. Include context in logs: timestamps, function names, relevant data (but not sensitive info like passwords).
+5. Prefer predictable operation markers for key flows (e.g., `BEGIN:<operation>`, `END:<operation>`, `ERROR:<operation>`), especially for API endpoints and external integrations.
+6. Ensure `END:<operation>` is always logged for key flows (use a `finally` block so it runs even on failure).
+7. Measure duration for external calls or performance-sensitive operations (log `duration_ms`).
+8. Never log sensitive data (passwords, tokens, authorization headers, secrets, full request payloads).
+9. Keep logs concise and structured when possible (key-value pairs like `table_name=... request_id=...`).
 
 
 ### Naming Convention

@@ -109,16 +109,6 @@ alwaysApply: true
    - Avoid generic keys like `data`, `result` unless standardized.
 4. Keep request and response schemas stable and versioned.
 
----
-
-### Logging Naming
-
-1. Include function or operation names in log messages.
-2. Use consistent prefixes:
-   - `BEGIN:<operation>`
-   - `END:<operation>`
-   - `ERROR:<operation>`
-3. Avoid logging sensitive values (passwords, tokens, secrets).
 
 ---
 
