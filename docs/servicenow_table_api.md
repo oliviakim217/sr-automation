@@ -54,6 +54,11 @@ Instead of hand-writing complex queries, build a filter in the ServiceNow list U
   - For **GET**, `result` is usually a list of records.
   - For **POST**, `result` is usually the created record.
 
+### Reference samples in this repo
+
+- GET sample: `reference/servicenow_get_sc_request_sample_response.json`
+- POST sample: `reference/servicenow_post_sc_request_sample_response.json`
+
 ## Error format (common shape)
 
 ServiceNow errors commonly look like:

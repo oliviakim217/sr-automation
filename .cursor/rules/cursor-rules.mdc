@@ -14,7 +14,7 @@ category: "ide-rules"
 2. **Use Existing Patterns**: Before creating new code, check existing modules for patterns and follow the same structure.
 3. **Complete Implementations**: Generate complete, working code with proper error handling, not just stubs or placeholders.
 4. **Include Comments**: Add clear but concise comments explaining what each section does, especially for complex logic.
-5. **Guardrail**: Do not go overboard. Keep the code simple and minimal.
+5. **Guardrail**: Do not go overboard. Stick to the core functionality only.
 
 
 ### File and Folder Handling
